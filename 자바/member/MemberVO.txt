@@ -1,0 +1,98 @@
+package member;
+
+public class MemberVO {
+	
+	private String name;
+	private String id;
+	private String pass;
+	private String phone;
+	private String birth;
+	private String addr;
+	private String gender;
+	private String email;.
+	
+	public MemberVO() {}
+	
+	public MemberVO(String name, String id, String pass, String phone, String birth, String addr, String gender,String email) {
+		this.name = name;
+		this.id = id;
+		this.pass = pass;
+		this.phone = phone;
+		this.birth = birth;
+		this.addr = addr;
+		this.gender = gender;
+		this.email = email;
+	}
+
+
+	//GET
+	public String getName() {
+		return name;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getPass() {
+		return pass;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public String getBirth() {
+		return birth;
+	}
+
+	public String getAddr() {
+		return addr;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	// SET
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public void setBirth(String birth) {
+		this.birth = birth;
+	}
+
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	
+	
+	
+	
+}
