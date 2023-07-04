@@ -165,6 +165,21 @@ FTP-SIMPLE 세팅
 		"confirm": true
 	}
 ]
+
+집에서 FTP-SIMPLE 세팅
+[
+	{
+		"name": "ROOT",
+		"host": "jeonjucom.kr",
+		"port": 21045,
+		"type": "ftp",
+		"username": "master",
+		"password": "123456",
+		"path": "/home/master/ROOT",
+		"autosave": true,
+		"confirm": true
+	}
+]
 또는
 ftp 리모트
 home -> master -> ROOT -> .. // 경로를 찾아서 진행한다
