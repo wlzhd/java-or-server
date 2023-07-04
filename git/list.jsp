@@ -41,7 +41,7 @@
         <td><a href="/member/detail.jsp?idx=<%=m.getIdx()%>"><%=m.getIdx()%></a></td>
         <td>산대특</td>
         <td>2기</td>
-        <td><%=m.getName()%></td>
+        <td>김지성</td>
         <td>남</td>
         <td>2023-07-03</td>
       </tr>  

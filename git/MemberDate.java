@@ -26,13 +26,7 @@ public class MemberDate {
     }
 
     // 상세 목록 가져오기
-    public boolean search (String idx){
-        if(idx == 1){
-            
-        } else if{
 
-        }
-        return true;
-    }
+
 
 }
