@@ -1,0 +1,72 @@
+package member;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DBConnection {
+	
+	private static final String URL = "jdbc:mysql://15.164.218.36:3306/memberkjs";
+	private static final String USER = "userKJS";
+	private static final String PASS = "p@ssw0rd";
+	
+	public static Connection getConnection() {
+		// DB 연결 접속 정보 반환해주는 메서드
+		// DB 접속 객체 초기화
+		// 1. 라이브러리 Driver.class 파일 존재 여부 확인!!
+		// 2. DB접속
+		Connection conn = null; // 초기화
+		try{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection(URL,USER,PASS);
+		}catch(ClassNotFoundException e) {
+			System.out.println("드라이버 연결 오류 >>" + e);
+		}catch(SQLException e) {
+			System.out.println("DB 연결 오류 >> " + e);
+		}
+		return conn;
+	}
+	
+	
+	
+	
+	
+	
+	
+/*	public static void main(String args[]) {
+		// 예외처리
+		try {
+			// 에러가 발생할 실행문을 작성		
+			//이클립스와 DB연결 과정
+			Class.forName("com.mysql.cj.jdbc.Driver"); // 라이브러리(패키지)에서 클래스가 있는지 확인 
+			// DB연결 주소(ip)
+			String url = "jdbc:mysql://15.164.218.36:3306/memberkjs";
+			// DB 사용자 이름
+			String user = "userKJS";	
+			// DB 패스워드
+			String pass = "p@ssw0rd";
+			// DB 연결접속정보
+			Connection conn = DriverManager.getConnection(url,user,pass);
+			System.out.println("conn >> " + conn);
+			//DB SQL 연결 통로
+			Statement stmt = conn.createStatement();
+			System.out.println("stmt >> " + stmt);
+			//ISUD
+			//INSERT, UPDATE, DELETE, 쿼리 실행 결과값은 숫자값으로 나온다
+			//SELECT 쿼리 실행 결과 >> 테이블
+			
+			String query =	  "insert into membertable"
+							+ "(name, id, pw, phone, birth)"
+							+ "values('주일권','tialls','나도몰라','010-0000-0000','2001-10-02')";
+			
+			int result = stmt.executeUpdate(query);
+			System.out.println("result >>" + result);
+			
+		} catch(ClassNotFoundException e){ // e == 변수
+			System.out.println("드라이버 연결오류 : " + e);	
+		} catch(SQLException e){ // e == 변수
+			System.out.println("DB연결 오류 : " + e);
+		}
+	} // END OF MAIN*/
+} // END OF CLASS(DBConnection)

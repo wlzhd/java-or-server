@@ -1,0 +1,109 @@
+package member;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class StudentDAOImpl implements StudentDAO{
+	
+	public int insertStudent(StudentVO svo) {
+		System.out.println("StudentDAOImpl insertStudent 함수 진입");
+		// 0. 변수초기화 (DB접속정보, DB통로, 쿼리문, 실행문)
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String query = "";
+		int result = 0;
+		try {
+			// 1. DB연동
+			conn = DBConnection.getConnection();
+			// 2. 쿼리작성
+			query = "INSERT INTO STUDENTTABLE "
+					+ "values(?,?,?,?,?,?,SYSDATE())";
+			// 3. DB통로
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, svo.getName());
+			pstmt.setString(2, svo.getBirth());
+			pstmt.setString(3, svo.getSh());
+			pstmt.setString(4, svo.getCre());
+			pstmt.setString(5, svo.getAddr());
+			pstmt.setString(6, svo.getPhone());
+			// pstmt.setString(7, svo.getRedate());
+			System.out.println("pstmt >> " + pstmt);
+			// 4. 쿼리실행 & 결과
+			result = pstmt.executeUpdate(); // <- query 이거 넣으면 큰일난다
+		}catch(SQLException e){
+			System.out.println("DB오류 >> " + e);
+		}
+		return result;
+	}
+	
+	public int updateStudent(StudentVO svo) {
+		System.out.println("StudentDAOImpl updateStudent 함수 진입");
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String query = "";
+		int result = 0;
+		
+		try {
+			conn = DBConnection.getConnection();
+			query = "update studenttable "
+					+ "set "
+					+ "birth = ?, "
+					+ "sh = ?, "
+					+ "cre = ?, "
+					+ "addr = ?, "
+					+ "phone = ?, "
+					+ "redate = SYSDATE() "
+					+ "where name = ? ";
+			
+			pstmt = conn.prepareStatement(query);
+
+			pstmt.setString(1, svo.getBirth());
+			pstmt.setString(2, svo.getSh());
+			pstmt.setString(3, svo.getCre());
+			pstmt.setString(4, svo.getAddr());
+			pstmt.setString(5, svo.getPhone());
+			// pstmt.setString(6, svo.getRedate());
+			pstmt.setString(6, svo.getName());
+			
+			result = pstmt.executeUpdate();
+			
+		}catch(SQLException e){
+			System.out.println("DB오류 >> " + e);
+		}
+		return result;
+	}
+
+	public int deleteStudent(String name) {
+		System.out.println("StudentDAOImpl deleteStudent 함수 진입");
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String query = "";
+		int result = 0;
+		
+		try {
+			conn = DBConnection.getConnection();
+			query = "delete from studenttable "
+					+ "where name = ? ";
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, name);
+			result = pstmt.executeUpdate();
+		}catch(SQLException e){
+			System.out.println("DB오류 >> " + e);
+		}
+		return result;
+	}
+		
+
+	public ArrayList<StudentVO> selectAllStudent() {
+		System.out.println("StudentDAOImpl selectAllStudent 함수 진입");
+		return null;
+	}
+
+	public ArrayList<StudentVO> selectOneStudent(String name) {
+		System.out.println("StudentDAOImpl selectOneStudent 함수 진입");
+		return null;
+	}
+	
+}
