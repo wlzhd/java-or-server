@@ -1,0 +1,146 @@
+package member;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class StudentSrc {
+	public static void main(String agre[]) {
+		Scanner scan = new Scanner(System.in);
+		int flag = 0;
+		while(flag!=6) {
+			System.out.println("=============학생관리=============");
+			System.out.println("1.학생등록			2.학생수정			3.학생삭제");
+			System.out.println("4.학생전체조회		5.학생상세조회		6.종료");
+			flag = scan.nextInt();
+			
+			if(flag==1) {
+				System.out.println("학생등록");
+				
+				System.out.println("이름 >> ");
+				String name = scan.next();
+				System.out.println("생년월일 >> ");
+				String birth = scan.next();
+				System.out.println("학교 >> ");
+				String sh = scan.next();
+				System.out.println("수강과목 >> ");
+				String cre = scan.next();
+				System.out.println("주소 >> ");
+				String addr = scan.next();
+				System.out.println("전화번호 >> ");
+				String phone = scan.next();
+				
+				StudentVO svo = new StudentVO(name, birth, sh, cre, addr, phone, "");
+				
+				StudentDAOImpl sdao = new StudentDAOImpl();
+				
+				int result = sdao.insertStudent(svo);
+				
+				System.out.println("result >> " + result);
+				
+			}else if(flag==2) {
+				System.out.println("학생수정");
+				System.out.println("수정할 학생의 이름을 입력하시오 : ");
+				String name = scan.next();
+				
+				System.out.println("생년월일 >> ");
+				String birth = scan.next();
+				System.out.println("학교 >> ");
+				String sh = scan.next();
+				System.out.println("수강과목 >> ");
+				String cre = scan.next();
+				System.out.println("주소 >> ");
+				String addr = scan.next();
+				System.out.println("전화번호 >> ");
+				String phone = scan.next();
+				
+				StudentVO svo = new StudentVO(name ,birth, sh, cre, addr, phone, "");
+				
+				StudentDAOImpl sdao = new StudentDAOImpl();
+				
+				int resuly = sdao.updateStudent(svo);
+				
+				System.out.println("resuly >> " + resuly);
+				
+			}else if(flag==3) {
+				System.out.println("학생삭제");
+				System.out.println("삭제할 학생의 이름을 입력하시오 : ");
+				String name = scan.next();
+				
+				StudentDAOImpl sdao = new StudentDAOImpl();
+				
+				int result = sdao.deleteStudent(name);
+				
+				System.out.println("result >> " + result);
+
+			} else if(flag==4) {
+				System.out.println("학생전체조회");
+				
+				StudentDAOImpl sdao = new StudentDAOImpl();
+				
+				ArrayList<StudentVO> sList = sdao.selectAllStudent();
+				
+				if(sList.size() > 0) {
+					for(int i = 0; i<sList.size(); i++) {
+						StudentVO svo = sList.get(i);
+						String name = svo.getName();
+						String birth = svo.getBirth();
+						String sh = svo.getSh();
+						String cre = svo.getCre();
+						String addr = svo.getAddr();
+						String phone = svo.getPhone();
+						String redate = svo.getRedate();
+						
+						System.out.println("이름 : " + name
+										+ " 생년월일 : " + birth
+										+ " 학교 : " + sh
+										+ " 수강과목 : " + cre
+										+ " 주소 : " + addr
+										+ " 전화번호 : " + phone
+										+ " 날 : " + redate);
+						
+					}
+				} else {
+					System.out.println("조회할 회원이 없습니다");
+				}
+				
+			} else if(flag==5) {
+				System.out.println("학생상세조회");
+				System.out.println("조회할 학생의 이름을 입력하시오 : ");
+				String name = scan.next();
+				
+				StudentDAOImpl sdao = new StudentDAOImpl();
+				
+				ArrayList<StudentVO> sList = sdao.selectOneStudent(name);
+				
+				if(sList.size() > 0) {
+					for(int i = 0; i <sList.size(); i++) {
+					StudentVO svo = sList.get(i);
+					
+					name = svo.getName();
+					String birth = svo.getBirth();
+					String sh = svo.getSh();
+					String cre = svo.getCre();
+					String addr = svo.getAddr();
+					String phone = svo.getPhone();
+					String redate = svo.getRedate();
+					
+					System.out.println("이름 : " + name
+								+ " 생년월일 : " + birth
+								+ " 학교 : " + sh
+								+ " 수강과목 : " + cre
+								+ " 주소 : " + addr
+								+ " 전화번호 : " + phone
+								+ " 날 : " + redate);
+					
+				}
+					
+				} else {
+					System.out.println("조회할 회원이 없습니다");
+				}
+				
+				
+
+			}
+		}
+	}
+}

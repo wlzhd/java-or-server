@@ -1,0 +1,65 @@
+-----------------------------------------------------------------------------------------------------------------
+문자열
+-----------------------------------------------------------------------------------------------------------------
+package member;
+
+import java.util.Calendar;
+
+public class CheabunClass {
+	public static void main(String args[]) {
+		
+		Calendar cal = Calendar.getInstance();
+
+		int commYear = cal.get(Calendar.YEAR); // 년도 추출
+		int commMonth = cal.get(Calendar.MONTH)+1; // 월 추출 <- 이 친구는 0~11로 적용된다
+		int commDay = cal.get(Calendar.DAY_OF_MONTH); // 일 추출  DAY_OF_WEEK(요일을 알려준다?)
+		
+		String commyear_ = String.valueOf(commYear);
+		String commMonth_ = String.valueOf(commMonth);
+		String commDay_ = String.valueOf(commDay);
+		
+		int commMonth_len = commMonth_.length();
+		int commDay_len = commMonth_.length();
+		
+		if(commMonth_len == 1 && commDay_len == 1) {
+			commMonth_ = "0" + commMonth_;
+			commDay_ = "0" + commDay_;
+		}
+		
+		String commDate = "ST"+commyear_+commMonth_+commDay_;
+		
+	}
+}
+
+-----------------------------------------------------------------------------------------------------------------
+숫자
+-----------------------------------------------------------------------------------------------------------------
+package member;
+
+import java.util.Calendar;
+
+public class CheabunClass {
+
+   public static void main(String[] args) {
+	   
+      Calendar  cal = Calendar.getInstance();
+      
+      int commYear = cal.get(Calendar.YEAR);
+      int commMonch = cal.get(Calendar.MARCH)+1;
+      int commDay = cal.get(Calendar.DAY_OF_MONTH);
+      
+      String commDay_ = "";
+      String commMonch_ = "";
+      
+      if(commMonch < 10) {
+    	  commDay_ = "0"+String.valueOf(commDay);
+      }
+      if(commDay < 10) {
+    	  commMonch_ = "0"+String.valueOf(commMonch);
+      }
+      
+      String commDate = "ST+"commyear_+commMonth_+commDay_;
+
+   }
+
+}
