@@ -1,0 +1,3 @@
+file -> new -> dynamic Web project ->이름 model2 다음다음 체크 끝.
+model2 -> src , webapp, index.jsp 만들기
+model2 -> new -> Servlet -> kr.jeonjucom,BorardServlet-> contoller ->끝
