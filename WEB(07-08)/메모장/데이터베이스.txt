@@ -23,6 +23,7 @@ y
 systemctl stop mariadb
 rm -rf /var/lib/mysql/*
 mysql_install_db --datadir=/var/lib/mysql 
+데이터베이스 다시시작
 systemctl start mariadb 
 
 
@@ -56,6 +57,11 @@ sudo mysql -u root -p
 create database master;
 create user master@localhost identified by '123456'; // 계정 만들기
 grant all on master.* to master@localhost; // DB master의 계정을 master@localhost 이 사람만 사용한다 라는 명령어임
+flush privileges;
+
+create database master;
+create user master@192.168.0.201 identified by '123456';
+grant all on master.* to master@192.168.0.201;
 flush privileges;
 
 
@@ -109,6 +115,7 @@ part2 varchar(100) not null,
 part3 varchar(100) not null,
 part4 varchar(100) not null,
 part5 varchar(100) not null,
+part6 varchar(100) not null,
 regdate datetime not null,
 primary key(idx),
 constraint m_fk foreign key(midx)
@@ -136,9 +143,9 @@ insert into member(idx,course,gisu,name,gender,regdate) values(15,'산대특','2
 insert into member(idx,course,gisu,name,gender,regdate) values(16,'산대특','2기','이성원','남','2023-07-06');
 
 더미 데이터 저장
-insert into score(idx,midx,part1,part2,part3,part4,part5,regdate) values(1,2,100,100,100,100,100,'2023-07-06');
-insert into score(idx,midx,part1,part2,part3,part4,part5,regdate) values(2,2,100,100,100,100,100,'2023-07-06');
-insert into score(idx,midx,part1,part2,part3,part4,part5,regdate) values(3,2,100,100,100,100,100,'2023-07-06');
+insert into score(idx,midx,part1,part2,part3,part4,part5,part6,regdate) values('홍길동','연습','연습','');
+insert into score(idx,midx,part1,part2,part3,part4,part5,part6,regdate) values(2,2,100,100,100,100,100,100,'2023-07-06');
+insert into score(idx,midx,part1,part2,part3,part4,part5,part6,regdate) values(3,2,100,100,100,100,100,100,'2023-07-06');
 
 #테이블 삭제
 drop table member
@@ -218,3 +225,88 @@ Core태그
 glyphicon
 
 https://www.w3schools.com/bootstrap/bootstrap_ref_all_classes.asp
+
+-----------------------------------------------------07.10------------------------------------------------------------
+insert into board(name,subject,content,hit,ip,regdate) values('홍길동','연습','연습','1','127.0.0.1','2023-07-10');
+http://localhost:8080/model2/controller?command=board_list
+board > boardList.jsp
+
+*한글*
+import java.io.PrintWriter
+response.setContentType("text/html;charset=UTF-8");
+request.setCharacterEncoding("UTF-8");
+PrintWriter out = response.getWriter();
+out.print("출력");
+
+http://localhost:8080/model2/controller?command=board_list
+---------------------------------------------------------------------------------
+***kr.jeonjucom.controllor.BoardServlet.java***안에 들어갈것
+
+package kr.jeonjucom.controller;
+
+import java.io.PrintWriter;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import kr.jeonjucom.controller.action.BoardListAction;
+
+@WebServlet("/controller")
+public class BorardServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    public BorardServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.setContentType("text/html;charset=UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+		out.print("<hr>");
+		String command = request.getParameter("command");
+		out.println(command);
+		System.out.println(command);
+		
+		if(command.equals("board_list")) { // board_list 이름에 따라 클래스도 다르게 설정한다.1-1예시
+			BoardListAction action = new BoardListAction();
+			out.println(">board_list");
+			System.out.println(">board_list");
+			action.move(request, response);
+		}else if(command.equals("board_write_form")) { // 1-1 예시
+			BoardListAction action = new BoardListAction();
+			out.println(">board_list");
+			System.out.println(">board_list");
+			action.move(request, response);
+		}
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+}
+----------------------------------------------------------------------------------
+***kr.jeonjucom.controllor.action.BoardListAtion.java***안에 들어갈것
+
+package kr.jeonjucom.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class BoardListAction { //위로 있는 1-1예시에 따라 클래스명을 고친다.
+
+	public void move(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		String url ="/board/boardList.jsp";
+		RequestDispatcher dispatcher = request.getRequestDispatcher(url);
+		dispatcher.forward(request,response);
+	}
+}
+---------------------------------------------------------------------------------------
