@@ -1,0 +1,31 @@
+JRE System Library [javaSE - 11] 오늘쪽 마우스 클릭 -> 아래에서 2번째 -> 2번째 클릭 -> 위에서 2번째 클릭
+
+package member;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DBConnection {
+	
+	private static final String URL = "jdbc:mysql://15.164.218.36:3306/memberkjs";
+	private static final String USER = "userKJS";
+	private static final String PASS = "p@ssw0rd";
+	
+	public static Connection getConnection() {
+		// DB 연결 접속 정보 반환해주는 메서드
+		// DB 접속 객체 초기화
+		// 1. 라이브러리 Driver.class 파일 존재 여부 확인!!
+		// 2. DB접속
+		Connection conn = null; // 초기화
+		try{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection(URL,USER,PASS);
+		}catch(ClassNotFoundException e) {
+			System.out.println("드라이버 연결 오류 >>" + e);
+		}catch(SQLException e) {
+			System.out.println("DB 연결 오류 >> " + e);
+		}
+		return conn;
+	}

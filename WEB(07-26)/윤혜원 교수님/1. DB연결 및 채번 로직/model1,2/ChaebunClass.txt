@@ -1,0 +1,56 @@
+select IFNULL(max(SUBSTR(B_NO,9,3)),0)+1 as MAXB_NO 
+from BOARDTABLE 
+where SUBSTR(B_NO, 2, 8) = DATE_FORMAT(SYSDATE(),'%Y%m%d');
+
+------------------------------------------------------------------------------------
+
+package com.jj.comm;
+
+import java.util.Calendar;
+
+public class ChaebunClass {
+   //상수
+   public static final String MEMBER = "M";
+   //날짜 정보
+   public static String calendarNO() {
+      //20230706
+      Calendar cal = Calendar.getInstance();//현재 날짜 정보
+      int commYear = cal.get(Calendar.YEAR);
+      int commMonth = cal.get(Calendar.MONTH)+1; //0~11 
+      int commDay = cal.get(Calendar.DAY_OF_MONTH);
+      
+      String commYear_ = String.valueOf(commYear);
+      String commMonth_ = String.valueOf(commMonth);
+      String commDay_ = String.valueOf(commDay);
+      
+      if(commMonth_.length() == 1) {
+         commMonth_ = "0"+commMonth_;
+      }
+      if(commDay_.length() == 1) {
+         commDay_ = "0"+commDay_;
+      }
+      String commDate = commYear_+commMonth_+commDay_;
+      System.out.println("commDate >> " + commDate);
+      
+      return commDate;
+   }
+   public static String maxNo(int max) {
+      String maxNo = String.valueOf(max);
+      if(maxNo.length() == 1) {
+         maxNo = "000"+maxNo;
+      }
+      else if(maxNo.length() == 2) {
+         maxNo = "00"+maxNo;
+      }
+      else if(maxNo.length() == 3) {
+         maxNo = "0"+maxNo;
+      }
+      return maxNo;
+   }
+   public static String memberNo(int max) {
+      String uno = ChaebunClass.MEMBER 
+               + ChaebunClass.calendarNO()
+               + ChaebunClass.maxNo(max);
+      return uno;
+   }
+}

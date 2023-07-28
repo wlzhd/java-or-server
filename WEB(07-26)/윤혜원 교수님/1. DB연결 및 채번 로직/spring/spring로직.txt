@@ -1,0 +1,10 @@
+스프링 체번로직
+
+<mapper namespace = "com.jj.app.board.mapper.BoardMapper"> <!-- 인터페이스 경로를 적어줘야 한다 -->
+	<select id = "boardCommNO" resultType = "java,lang.Integer">
+		select IFNULL(max(SUBSTR(B_NO,9,3)),0)+1 as MAXB_NO 
+		from BOARDTABLE 
+		where SUBSTR(B_NO, 2, 8) = DATE_FORMAT(SYSDATE(),'%Y%m%d');
+	</select>
+
+------------------------------------------------------------------------------------------------

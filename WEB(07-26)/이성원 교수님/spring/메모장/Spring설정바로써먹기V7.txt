@@ -1,0 +1,2591 @@
+테스트 코드 사용할때 꼭 필요한 문법
+mockMvc.perform(get("/board/list").andReturn().getModelAndView().getModelMap());
+
+스프링 설정 방법
+
+순서가 있다 그걸 잘 따라 해라
+
+(lombok) get/set 자동 설정 해주는 친구 다운
+(pom.xml 교체) 아래부터 (#게시판+로그인) 위에까지 복붙 (pom.xml안에 있는 내용 모두 삭제하고 붙여넣기) ->
+구글에 검색 메이븐 레파지토리 -> lombok 검색 -> Project Lombok 들어가기 -> 버전 확인 후 lombok검색해서 최신버전으로 버전 변경해준 후 -> alt + f5 눌러주고 ->
+sts-3.9.17.RELEASE 폴더 안에 lombok.jar 파일 넣어주기 안되면 -> 패키지 하나 만들기 -> 만든 패키지에 CLASS VO 만들기 -> 그럼 스피링이 알아서 해준다
+*** 책 39 페이지 참고***
+
+DB연결
+패키지 하나 만들기 -> 만든 패키지에 인터페이스 만들기 -> 인터페이스 안에 public ArrayList<BoardVO> selectAllBoards(); 작성
+
+테스트 코드 하는 방법
+src/test/resources 안에 패키지 및 클래스 만들기 (테스트할 패키지와 클래스 만들기)
+
+------------------------------------------------------------------------------------------------
+[스프링 환경설정파일]
+pom.xml (Project / Object / Model)
+: 프로젝트 옵션 설정
+
+web.xml
+: 스프링 웹 환경 설정 (인코딩 추가)
+<!-- 한글 변환 필터 시작 -->
+   <filter>
+      <filter-name>encodingFilter</filter-name>
+      <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+      <init-param>
+         <param-name>encoding</param-name>
+         <param-value>UTF-8</param-value>
+      </init-param>
+      <init-param>
+         <param-name>forceEncoding</param-name>
+         <param-value>true</param-value>
+      </init-param>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>encodingFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+   <!-- 한글 변환 필터 끝 -->
+
+servlet - context.xml
+: 웹에서 사용자(클라이언트)의 요청을 받기 위한 설정
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+#최종
+완성된 코드를 이용해서 프로젝트를 마무리 하자!
+1. 프로젝트 만들기
+2. pom.xml 및 기타 설정 파일을 수정한다.
+3. 드라이버 연결 및 JDBCTests 작성 DataSourceTests 작성
+4. Mapper 인터페잇 및 Mapper XML 작성
+
+머리만 만들기
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.jeonjucom.mapper.BoardMapper"> <!-- 여기 수정 -->
+<select id="getList" resultType="kr.jeonjucom.domain.BoardVO"> <!-- 여기 수정 -->
+<![CDATA[
+	select * from tbl_board where bno > 0
+]]>
+</select>
+
+<select id="getListWithPaging">
+</select>
+<select id="getTotalCount">
+</select>
+<sql id="criteria">
+</sql>
+</mapper>
+
+
+5. 테스트 코드로 확인
+
+
+
+6. 페이지 확인
+http:/192.168.0.45/controller?command=board_list
+
+
+
+4. 현재 발생하는 오류는 테이블 오류!(테이블 생성)
+5. 테스트
+------------------------------------------------------------------------------------------------
+#1. 
+
+#2. pom.xml 교체
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>kr.jeonjucom</groupId> <!-- 여기 수정 (kr.jeonjucom)-->
+	<artifactId>controller</artifactId> <!-- controller -->
+	<name>ex05</name>
+	<packaging>war</packaging>
+	<version>1.0.0-BUILD-SNAPSHOT</version>
+
+	<properties>
+		<java-version>1.11</java-version> <!-- 여기 수정 1.11-->
+		<org.springframework-version>5.0.7.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.9.0</org.aspectj-version>
+		<org.slf4j-version>1.7.25</org.slf4j-version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework-version}</version>
+			<exclusions>
+				<!-- Exclude Commons Logging in favor of SLF4j -->
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+		
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>2.7.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.4.6</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4 -->
+		<dependency>
+			<groupId>org.bgee.log4jdbc-log4j2</groupId>
+			<artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+			<version>1.16</version>
+		</dependency>		
+
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+			</exclusions>
+			<!-- <scope>runtime</scope> -->
+		</dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+
+
+	<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+	<dependency>
+		<groupId>org.quartz-scheduler</groupId>
+		<artifactId>quartz</artifactId>
+		<version>2.3.0</version>
+	</dependency>
+
+
+	<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz-jobs -->
+	<dependency>
+		<groupId>org.quartz-scheduler</groupId>
+		<artifactId>quartz-jobs</artifactId>
+		<version>2.3.0</version>
+	</dependency>
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-web</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-config</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-core</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-taglibs</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.11</source> <!-- 여기 수정 1.11(그냥 11도 가능)-->
+					<target>1.11</target> <!-- 여기 수정 1.11(그냥 11도 가능)-->
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<mainClass>org.test.int1.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+----------------------------------------------------------------------------------
+#게시판+로그인
+#초기설정
+Step1 pom.xml수정
+<properties>
+      <java-version>1.8</java-version>
+      <org.springframework-version>5.0.7.RELEASE</org.springframework-version>
+      <org.aspectj-version>1.6.10</org.aspectj-version>
+      <org.slf4j-version>1.6.6</org.slf4j-version>
+   </properties>
+   <dependencies>
+      <!-- Spring -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-context</artifactId>
+         <version>${org.springframework-version}</version>
+         <exclusions>
+            <!-- Exclude Commons Logging in favor of SLF4j -->
+            <exclusion>
+               <groupId>commons-logging</groupId>
+               <artifactId>commons-logging</artifactId>
+             </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-webmvc</artifactId>
+         <version>${org.springframework-version}</version>
+      </dependency>
+            
+      <!-- AspectJ -->
+      <dependency>
+         <groupId>org.aspectj</groupId>
+         <artifactId>aspectjrt</artifactId>
+         <version>${org.aspectj-version}</version>
+      </dependency>   
+      
+      <!-- Logging -->
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>${org.slf4j-version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>jcl-over-slf4j</artifactId>
+         <version>${org.slf4j-version}</version>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-log4j12</artifactId>
+         <version>${org.slf4j-version}</version>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.15</version>
+         <exclusions>
+            <exclusion>
+               <groupId>javax.mail</groupId>
+               <artifactId>mail</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>javax.jms</groupId>
+               <artifactId>jms</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>com.sun.jdmk</groupId>
+               <artifactId>jmxtools</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>com.sun.jmx</groupId>
+               <artifactId>jmxri</artifactId>
+            </exclusion>
+         </exclusions>
+         <scope>runtime</scope>
+      </dependency>
+
+      <!-- @Inject -->
+      <dependency>
+         <groupId>javax.inject</groupId>
+         <artifactId>javax.inject</artifactId>
+         <version>1</version>
+      </dependency>
+            
+      <!-- Servlet -->
+<dependency>
+  <groupId>javax.servlet</groupId>
+  <artifactId>javax.servlet-api</artifactId>
+  <version>3.1.0</version>
+  <scope>provided</scope>
+</dependency>
+
+      <dependency>
+         <groupId>javax.servlet.jsp</groupId>
+         <artifactId>jsp-api</artifactId>
+         <version>2.1</version>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.2</version>
+      </dependency>
+   
+      <!-- Test -->
+<dependency>
+   <groupId>junit</groupId>
+   <artifactId>junit</artifactId>
+   <version>4.12</version>
+   <scope>test</scope>
+</dependency>     
+
+<dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${org.springframework-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${org.springframework-version}</version>
+    </dependency>
+       <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${org.springframework-version}</version>
+    </dependency>
+
+<dependency>
+  <groupId>com.zaxxer</groupId>
+  <artifactId>HikariCP</artifactId>
+  <version>2.7.8</version>
+</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+<dependency>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis</artifactId>
+  <version>3.4.6</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
+<dependency>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis-spring</artifactId>
+  <version>1.3.2</version>
+</dependency>
+
+
+<dependency>
+  <groupId>org.bgee.log4jdbc-log4j2</groupId>
+  <artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+  <version>1.16</version>
+</dependency>
+
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+  <version>1.18.0</version>
+  <scope>provided</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-web</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-config</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-core</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>     
+    
+    
+<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-taglibs</artifactId>
+    <version>5.0.6.RELEASE</version>
+</dependency>      
+   </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <additionalProjectnatures>
+                        <projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalBuildcommands>
+                        <buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+                    </additionalBuildcommands>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>2.5.1</version>
+    <configuration>
+        <source>1.8</source>
+        <target>1.8</target>
+        <compilerArgument>-Xlint:all</compilerArgument>
+        <showWarnings>true</showWarnings>
+        <showDeprecation>true</showDeprecation>
+    </configuration>
+</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <mainClass>org.test.int1.Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+	
+Step2 서버 시작후 웹으로 확인
+http://localhost/controller 후 Tomcat 환경 설정 후 /Controller --> / 로 변경
+서버 재시작후 http://localhost/ 로 확인
+
+Step3 maven update
+1.6 --> 1.8 버전 변경 확인
+(오라클 용이라 수정 필요)
+Step4 root-context.xml 수정
+
+	<?xml version="1.0" encoding="UTF-8"?>
+		<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!--Root Context: defines shared resources visible to all other web components -->
+		<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<!--
+		<property name="driverClassName"
+			value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		-->
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver"></property> <!-- 여기 수정 -->
+		<property name="jdbcUrl"
+			value="jdbc:mysql://192.168.0.45:3306/master"></property> <!-- 여기 수정 -->
+		<property name="username" value="master"></property> <!-- 여기 수정 -->
+		<property name="password" value="123456"></property> <!-- 여기 수정 -->
+
+	</bean>
+
+	<!-- HikariCP configuration -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<mybatis-spring:scan
+		base-package="kr.jeonjucom.mapper" /> <!-- 여기 수정 -->
+
+	<context:component-scan
+		base-package="kr.jeonjucom.service"></context:component-scan>	<!-- 여기 수정 -->
+</beans>
+
+
+Step5 namespace mybatis-spring와 context 체크하기
+
+
+
+Step6 서버 시작후 웹으로 확인
+http://localhost:8080
+Hello world 확인
+에러 확인후 
+src/main/resources에 파일 생성
+위치 > src >main>resources
+log4jdbc.log4j2.properties을 만든다
+log4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+
+Step7 드라이버 연결
+Step8 
+Step9 서버 시작후 웹으로 확인
+http://localhost:8080
+Hello world 확인
+에러 확인후
+
+Step10 기본 로그인 기능 추가
+파일 위치 > Spring33/src/main/webapp/WEB-INF/spring
+security-context.xml 을 만든후 아래 내용 채우기
+<security:http>
+	<security:form-login/>
+</security:http>
+
+<security:authentication-manager>
+</security:authentication-manager>
+
+web.xml 내용추가 
+	<!-- 한글처리 -->
+	<filter>
+		<filter-name>encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>encoding</filter-name>
+		<servlet-name>appServlet</servlet-name>
+	</filter-mapping>
+   <filter>
+      <filter-name>springSecurityFilterChain</filter-name>
+      <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>springSecurityFilterChain</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+서버 재시작 ---> 에러 확인 (securty설정파일의 위치가 어디 있는지 모른다)
+No bean named 'springSecurityFilterChain' available
+
+해결방법>
+web.xml에 내용추가
+	<!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml
+		/WEB-INF/spring/security-context.xml
+		</param-value>
+	</context-param>
+
+security-context.xml파일에 아래의 step1 내용 추가
+1단계 기본 설정끝!
+
+
+
+로그인 기능 확장
+http://localhost:8080/login으로 설정이 정상적으로 되어 있는지 확인할것
+--------------------------------------------------------------------------------------
+Step2 본인이 직접 만든 로그인 페이지로 연결
+<security:http>
+	<security:form-login login-page="/customLogin" />
+</security:http>
+<security:authentication-manager>
+</security:authentication-manager>
+
+--------------------------------------------------------------------------------------
+step3 권한과 인증이 필요한 페이지를 선택한다.
+<security:intercept-url pattern="/board/list"  access="permitAll" />
+<security:intercept-url pattern="/profile" access="hasRole('ROLE_MEMBER')" />
+<security:intercept-url pattern="/admin" access="hasRole('ROLE_ADMIN')" />
+
+step4 권한과 인증이 필요한 페이지에 대한 룰 추가
+<security:authentication-manager> 
+<security:authentication-provider> 
+<security:user-service> 
+<security:user name="member" password="{noop}member"  authorities="ROLE_MEMBER"/> 
+<security:user name="admin" password="{noop}admin"  authorities="ROLE_MEMBER, ROLE_ADMIN"/> </security:user-service> </security:authentication-provider> 
+</security:authentication-manager> 
+
+=============================================================================================
+
+#로그인 기능 개발
+Step1
+
+회원도메인,회원Mapper 만들자
+
+MemberVO
+String userid;
+String userpw;
+String userName;
+String enabled;
+Date regDate;
+Date updateDate;
+List<AuthVO> authList;
+
+AuthVO
+String userid;
+String auth;
+
+
+
+P620 인증과 권한의 단계
+<security:intercept-url pattern="/profile" access="hasRole('ROLE_MEMBER')"/>
+
+
+step1
+<securtiy:user-service>
+  <security:user name="admin" password="123456" authorities="ROLE_MEMBER" />
+</securtiy:user-service>
+
+step2(649)+데이터베이스연동(오라클)
+<security:jdbc-user-service data-source-ref="dataSource" />
+
+step3(667)+데이터베이스연동(오라클)
+<security:authentication-provider user-service-ref="customUserDatailService" />
+C2SMXVO
+
+p705(기존 프로젝트 스프링 시큐리티 접목)
+security-context.xml
+com.jslhrd.security
+customUserDetailService.java
+com.jslhrd.domain
+MemberVO, AuthVO
+web.xml > securtiy-context.xml 필터추가
+MemberMapper 인터페이스와 MemberMapper.xml 추가
+com.jslhrd.controller > CommonController 추가
+p701 
+@Secured
+@PreAuthorize
+@PostAuthorize
+
+customLogin.jsp 만들떄
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+
+[로그인최종]
+security-context.xml 내용 수정이 아래와 같이 수정이 되면....
+<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>	
+<bean id="customUserDetailsService" class="com.jslhrd.security.CustomUserDetailsService"></bean>
+
+	<security:authentication-manager>
+
+		<security:authentication-provider
+			user-service-ref="customUserDetailsService">
+
+			<security:password-encoder
+				ref="bcryptPasswordEncoder" />
+
+		</security:authentication-provider>
+
+	</security:authentication-manager>
+
+com.jslhrd.security
+CustomUserDetailsService.java
+
+package com.jslhrd.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.jslhrd.domain.MemberVO;
+import com.jslhrd.mapper.MemberMapper;
+import com.jslhrd.security.domain.CustomUser;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@Log4j
+public class CustomUserDetailsService implements UserDetailsService {
+
+	@Setter(onMethod_ = { @Autowired })
+	private MemberMapper memberMapper;
+
+	@Override
+	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+
+		log.warn("Load User By UserName : " + userName);
+
+		// userName means userid
+		MemberVO vo = memberMapper.read(userName);
+
+		log.warn("queried by member mapper: " + vo);
+
+		return vo == null ? null : new CustomUser(vo);
+	} 
+
+}
+
+com.jslhrd.security.domain
+CustomUser.java
+package com.jslhrd.security.domain;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import com.jslhrd.domain.MemberVO;
+
+import lombok.Getter;
+
+@Getter
+public class CustomUser extends User {
+
+	private static final long serialVersionUID = 1L;
+
+	private MemberVO member;
+
+	public CustomUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+		super(username, password, authorities);
+	}
+
+	public CustomUser(MemberVO vo) {
+
+		super(vo.getUserid(), vo.getUserpw(), vo.getAuthList().stream()
+				.map(auth -> new SimpleGrantedAuthority(auth.getAuth())).collect(Collectors.toList()));
+
+		this.member = vo;
+	}
+}
+
+com.lslhrd.domain
+MemberVO.java
+package com.jslhrd.domain;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class MemberVO {
+
+	private String userid;
+	private String userpw;
+	private String userName;
+	private boolean enabled;
+
+	private Date regDate;
+	private Date updateDate;
+	private List<AuthVO> authList;
+
+}
+
+AuthVO.java
+package com.jslhrd.domain;
+
+
+import lombok.Data;
+
+@Data
+public class AuthVO {
+
+  private String userid;
+  private String auth;
+  
+}
+
+com.jslhrd.mapper
+MemberMapper.java
+
+package com.jslhrd.mapper;
+
+import com.jslhrd.domain.MemberVO;
+
+public interface MemberMapper {
+
+	public MemberVO read(String userid);
+}
+
+MemberMapper.xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jslhrd.mapper.MemberMapper">
+
+
+  <resultMap type="com.jslhrd.domain.MemberVO" id="memberMap">
+    <id property="userid" column="userid"/>
+    <result property="userid" column="userid"/>
+    <result property="userpw" column="userpw"/>
+    <result property="userName" column="username"/>
+    <result property="regDate" column="regdate"/>
+    <result property="updateDate" column="updatedate"/>
+    <collection property="authList" resultMap="authMap">
+    </collection> 
+  </resultMap>
+  
+  <resultMap type="com.jslhrd.domain.AuthVO" id="authMap">
+    <result property="userid" column="userid"/>
+    <result property="auth" column="auth"/>
+  </resultMap>
+  
+  <select id="read" resultMap="memberMap">
+SELECT 
+  mem.userid,  userpw, username, enabled, regdate, updatedate, auth
+FROM 
+  tbl_member mem LEFT OUTER JOIN tbl_member_auth auth on mem.userid = auth.userid 
+WHERE mem.userid = #{userid} 
+  </select>
+
+</mapper>
+
+
+MemberMapperTests.java
+package com.jslhrd.mapper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import com.jslhrd.domain.MemberVO;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringRunner.class)
+@ContextConfiguration({"file:src/main/webapp/WEB-INF/spring/root-context.xml"})
+@Log4j
+public class MemberMapperTests {
+
+  @Setter(onMethod_ = @Autowired)
+  private MemberMapper mapper;
+  
+  
+  @Test
+  public void testRead() {
+    
+    MemberVO vo = mapper.read("admin10");
+    
+    log.info(vo);
+    
+    vo.getAuthList().forEach(authVO -> log.info(authVO));
+    
+  }
+  
+}
+admin.jsp
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<p><sec:authentication property="principal"/></p>
+<p></p>
+
+<input type="hidde" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+web.xml에 한글 처리 
+<filter> 
+  <filter-name>
+  <filter-class>
+  <init-param>
+  </init-param>
+</filter>
+<filter-mapping>
+</filter-mapping>
+
+C2SMX
+Controller
+Service
+ServiceImpl
+Mapper
+XML
+
+반드시 테스트 코드로 CRUD(Create Read Update Delete) 확인
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+2단계 개발준비단계
+게시판 마무리
+패키지 네이밍 정리와 디렉토리 및 페이지명 정리
+p166
+com.jslhrd.config
+com.jslhrd.controller
+>BoardController.java(C)
+>CommonController.java(C)
+>HomeController.java(C)
+com.jslhrd.service
+>BoardService.java(I)
+>BoardServiceImpl.java(C)
+com.jslhrd.domain
+BoardVO.java(C)
+MemberVO.java(C)
+AuthVO.java(C)
+com.jslhrd.persistence
+com.jslhrd.exception
+com.jslhrd.security
+>CustomUserDetailsService.java
+>CustomUser.java
+com.jslhrd.util
+com.jslhrd.aop
+
+/includes/
+>header.jsp
+>footer.jsp
+/board/
+>list.jsp
+>register.jsp
+>delete.jsp
+>update.jsp
+paging.jsp
+search.jsp
+profile.jsp
+mypage.jsp
+admin.jsp
+custmonLogin.jsp
+customLogout.jsp
+customRegister.jsp
+
+/resources/에 디자인에 필요한 파일 옮김
+=====================================================
+3단계 개발시작단계(교재중심)
+Step1
+includes에 header,footer 작업
+heaer.jsp
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">SB Admin v2.0</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-messages">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Smith</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Yesterday</em>
+                                    </span>
+                                </div>
+                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Smith</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Yesterday</em>
+                                    </span>
+                                </div>
+                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Smith</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Yesterday</em>
+                                    </span>
+                                </div>
+                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>Read All Messages</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-messages -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-tasks">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 1</strong>
+                                        <span class="pull-right text-muted">40% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                                            <span class="sr-only">40% Complete (success)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 2</strong>
+                                        <span class="pull-right text-muted">20% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+                                            <span class="sr-only">20% Complete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 3</strong>
+                                        <span class="pull-right text-muted">60% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+                                            <span class="sr-only">60% Complete (warning)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 4</strong>
+                                        <span class="pull-right text-muted">80% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
+                                            <span class="sr-only">80% Complete (danger)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>See All Tasks</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-tasks -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> New Comment
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
+                                    <span class="pull-right text-muted small">12 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i> Message Sent
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> New Task
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-upload fa-fw"></i> Server Rebooted
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>See All Alerts</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li class="sidebar-search">
+                            <div class="input-group custom-search-form">
+                                <input type="text" class="form-control" placeholder="Search...">
+                                <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                            </div>
+                            <!-- /input-group -->
+                        </li>
+                        <li>
+                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="flot.html">Flot Charts</a>
+                                </li>
+                                <li>
+                                    <a href="morris.html">Morris.js Charts</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="tables.html"><i class="fa fa-table fa-fw"></i> Tables</a>
+                        </li>
+                        <li>
+                            <a href="forms.html"><i class="fa fa-edit fa-fw"></i> Forms</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="panels-wells.html">Panels and Wells</a>
+                                </li>
+                                <li>
+                                    <a href="buttons.html">Buttons</a>
+                                </li>
+                                <li>
+                                    <a href="notifications.html">Notifications</a>
+                                </li>
+                                <li>
+                                    <a href="typography.html">Typography</a>
+                                </li>
+                                <li>
+                                    <a href="icons.html"> Icons</a>
+                                </li>
+                                <li>
+                                    <a href="grid.html">Grid</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="#">Second Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Second Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Third Level <span class="fa arrow"></span></a>
+                                    <ul class="nav nav-third-level">
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                    </ul>
+                                    <!-- /.nav-third-level -->
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-files-o fa-fw"></i> Sample Pages<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="blank.html">Blank Page</a>
+                                </li>
+                                <li>
+                                    <a href="login.html">Login Page</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper"> 
+includes > header.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+
+home.jsp을 
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file = "" %>
+내용추가
+<%@ include file = "" %>
+
+header에 자바스크립트 반드시 추가해줄것
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+includes > footer.jsp
+css,js 적용
+
+
+includes 
+HomeController에서 home.jsp 파일 수정
+
+Step11 개발(p164)+p712(로그인과정처리)내용과 같이 진행
+BoardController 생성후 모든 페이지와 연결하기
+@Controller
+@RequestMapping()
+
+@GetMapping()
+public void list()
+{
+
+}
+
+
+Step12 list 작업
+views 디렉토리안에 includes와 board 디렉토리를 생성
+
+http://localhost/board/list
+list 내용 확인
+
+      <c:forEach var="board" items="${list}">
+      <tr>
+        <td><c:out value="${board.bno}" /></td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>                
+      </tr>
+      </c:forEach>
+
+
+
+Step14 list에 데이터베이스의 데이터를 출력하라~
+controller  > service(I) > serviceImpl > mapper(I) > xml(F)
+
+Step15 페이징과 검색 페이지 만들기
+paging.jsp
+p308
+https://v4-alpha.getbootstrap.com/components/pagination
+[기존]
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+</nav>
+[변형]
+<c:forEach var="num" begin="" end="">
+    <li class="paginate_button"><a class="page-link" href="#">${num}</a></li>
+</c:forEach>
+
+[최종]
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+<c:forEach var="num" begin="" end="">
+    <li class="paginate_button"><a class="page-link" href="#">${num}</a></li>
+</c:forEach>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+</nav>
+
+
+search.jsp
+Step16 검색페이지 만들기
+<form id="" action="" method="get" >
+<select name="">
+<option value=""></option>
+<option value=""></option>
+<option value=""></option>
+</select>
+<input type="" name="keyword">
+<button class="">검색</button>	
+</form>
+
+
+list.jsp상단에
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+  
+Step18 개발 순서
+p190, p198,p211,p238
+http://localhost:8080/board/list
+C2SSMX
+------------------------------------------
+Controller
+model.addAttribute("list",?)
+model.addAttribute("list",service.getList()) 
+String,Object --> String, void ---> String,List
+S(I)
+BoardService
+getList()
+SImpl(C)
+Mapper(I) > 리턴타입 매칭
+X(F)
+<![CDATA[
+
+]]>
+애노테이션 걸기
+
+Step19 list화면 출력
+      <c:forEach var="board" items="${list}">
+      <tr>
+        <td><c:out value="${board.bno}" /></td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>
+        <td>${board.bno}</td>                
+      </tr>
+      </c:forEach>
+
+
+Step20 완성코드
+list.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
+<%@ include file="../includes/header.jsp"%>
+<div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">게시판목록</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            DataTables Advanced Tables
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                <thead>
+                                    <tr>
+                                        <th>번호</th>
+                                        <th>제목</th>
+                                        <th>작성자</th>
+                                        <th>작성일</th>
+                                        <th>수정일</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd gradeX">
+                                        <td>0</td>
+                                        <td>50기 전원 취업</td>
+                                        <td>홍길동</td>
+                                        <td class="center">2021-12-02</td>
+                                        <td class="center">2021-12-02</td>
+                                    </tr>
+                                    
+                                    <!--  데이터 반복 -->
+                                    
+                                          <c:forEach var="board" items="${list}">
+									      <tr>
+									        <td><c:out value="${board.bno}" /></td>
+									        <td>${board.bno}</td>
+									        <td>${board.bno}</td>
+									        <td>${board.bno}</td>
+									        <td>${board.bno}</td>                
+									      </tr>
+									      </c:forEach>
+								       <!--  데이터 끝 -->	      
+                                </tbody>
+                                </table>
+                               	<!-- 검색시작 -->
+                               	<form id="" action="" method="get" >
+									<select name="">
+									<option value=""></option>
+									<option value=""></option>
+									<option value=""></option>
+									</select>
+									<input type="" name="keyword">
+									<button class="">검색</button>	
+								</form>
+								<!-- 검색 끝 -->
+									
+                               	<!-- 페이징 시작 -->
+                               	<div class="pull-right">
+									  <ul class="pagination">
+									    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+									<c:forEach var="num" begin="1" end="10">
+									    <li class="paginate_button"><a href="#">${num}</a></li>
+									</c:forEach>
+									    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+									  </ul>
+								</div>
+                               	<!-- 페이징 끝 -->
+                              </div>
+                             </div>
+                            </div>
+<%@ include file="../includes/footer.jsp"%>
+=============================================================
+#단계4  개발
+C2SMX
+C > S > S > M > X
+영속영역
+Mapper > XML > Test코드
+
+
+서비스영역 > Test코드
+
+웹영역 > Test코드
+
+웹브라우저로 확인(틀만 일단)
+
+
+댓글에 적용
+C2SMX
+C > S > S > M > X
+영속영역
+Mapper > XML > Test코드
+
+
+서비스영역 > Test코드
+
+웹영역 > Test코드
+
+웹브라우저로 확인(틀만 일단)
+
+===============================================================
+10명, 1명(네트워크,시스템,악성코드분석,포렌식) 5명
+2명() 불합격 > 10 > 
+
+===============================================================
+
+웹영역 > Test코드
+.jsp  --> .jsp.enc  --> 
+60*60*24 =86500*10000000000000000000 = 
+네트워크,시스템,프로그램 ==> 모바일보안(java),네트워크보안(프로그램),포렌식(프로그램),
+악성코드분석(프로그램)
+
+=============================================================
+BoardController.java
+package com.jslhrd.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.jslhrd.service.BoardService;
+
+import lombok.AllArgsConstructor;
+
+@Controller
+@RequestMapping("/board/*")
+@AllArgsConstructor
+
+public class BoardController {
+	private BoardService service;
+	@GetMapping("/list")
+	public void list(Model model)
+	{
+		model.addAttribute("list",service.getList()); 
+		//? : 내용물을 담아서 보내자
+		//String,Object --> String,void (Error)
+	}
+
+}
+
+BoardService.java
+package com.jslhrd.service;
+
+import java.util.List;
+
+import com.jslhrd.domain.BoardVO;
+
+public interface BoardService {
+	public List<BoardVO> getList();
+
+}
+
+BoardServiceImpl.java
+package com.jslhrd.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.jslhrd.domain.BoardVO;
+import com.jslhrd.mapper.BoardMapper;
+
+import lombok.AllArgsConstructor;
+@Service
+@AllArgsConstructor
+public class BoardServiceImpl implements BoardService{
+	private BoardMapper mapper;
+	@Override
+	public List<BoardVO> getList() {
+		return mapper.getList();	
+	}
+}
+
+BoardMapper.java
+package com.jslhrd.mapper;
+
+import java.util.List;
+
+import com.jslhrd.domain.BoardVO;
+
+public interface BoardMapper {
+	public List<BoardVO> getList();
+
+}
+
+
+
+BoardMapper.xml
+[디렉토리 / src/main/resources]
+kr > jeonjucom > mapper > BoardMapper >
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.jeonjucom.mapper.BoardMapper"> <!-- 여기 수정 -->
+<select id="getList" resultType="kr.jeonjucom.domain.BoardVO"> <!-- 여기 수정 -->
+<![CDATA[
+	select * from tbl_board where bno > 0
+]]>
+</select>
+
+<select id="getListWithPaging">
+</select>
+<select id="getTotalCount">
+</select>
+<sql id="criteria">
+</sql>
+</mapper>
+
+
+
+BoardVO.java
+package com.jslhrd.domain;
+
+import java.util.Date;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+
+public class BoardVO {
+	private Long bno;
+	private String title;
+	private String content;
+	private String writer;
+	private Date regdate;
+	private Date updateDate;
+}
+
+
+
+Tip 테스트 코드
+#MapperTest
+package com.jslhrd.mapper;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.jslhrd.domain.BoardVO;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml"
+})
+@Log4j
+
+public class BoardMapperTests {
+	
+	@Setter(onMethod_ =@Autowired)
+	private BoardMapper mapper;
+	/*
+	@Test
+	public void testGetList()
+	{
+		mapper.getList().forEach(board->log.info(board));
+	}
+	
+	
+	@Test
+	public void testInsert()
+	{
+		log.info("^^");
+		BoardVO board= new BoardVO();
+		board.setTitle("50기 전원 취업");
+		board.setContent("축하합니다");
+		board.setWriter("홍길동");
+		mapper.insert(board);
+	}
+	
+	@Test
+	public void testRead()
+	{
+		BoardVO board = mapper.read(128L);
+		log.info(board);
+	}
+
+	@Test
+	public void testUpdate()
+	{
+		BoardVO board = new BoardVO();
+		board.setBno(126L);
+		board.setTitle("50기 전원 취업을 축하합니다.");
+		board.setContent("축하 축하");		
+		board.setWriter("홍길동~~~");
+		int count = mapper.update(board);
+		log.info("UPDATE COUNT: "+ count);
+	}
+
+	@Test
+	public void testDelete()
+	{
+		log.info("DELETE COUNT:" + mapper.delete(128L));
+		
+	}
+	*/
+}	
+
+
+
+#ServiceTest
+package com.jslhrd.service;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.jslhrd.domain.BoardVO;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml"
+})
+@Log4j
+public class BoardServiceTests {
+	@Setter(onMethod_ =@Autowired)
+	private BoardService service;
+	
+	/*
+	@Test
+	public void testGetList()
+	{
+		service.getList().forEach(board->log.info(board));
+	}
+
+	@Test
+	public void testGet()
+	{
+		log.info(service.get(144L));
+	}	
+
+	@Test
+	public void testUpdate()
+	{
+		BoardVO board = service.get(126L);
+		
+		if(board == null)
+		{
+			return;
+		} 
+		board.setTitle("50기 전원 취업 했습니다._3");
+		board.setContent("축하축하_3");	
+		board.setWriter("이성원_3");
+		log.info(service.modify(board));
+	}		
+		
+	*/
+
+	@Test
+	public void testDelete()
+	{
+		log.info(service.delete(11L));
+	}	
+	
+}
+
+
+
+#ControllerTest
+package com.jslhrd.controller;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
+})
+@Log4j
+
+public class BoardControllerTests {
+	
+	@Setter(onMethod_ = @Autowired)
+	private WebApplicationContext ctx;
+	private MockMvc mockMvc;
+	
+	@Before
+	public void setup()
+	{
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+	}
+	
+	/*
+	@Test
+	public void testList() throws Exception
+	{
+		log.info(mockMvc.perform(MockMvcRequestBuilders.get("/board/list"))
+				.andReturn().getModelAndView().getModelMap()
+				);
+	}
+	
+	@Test
+	public void testRegister() throws Exception
+	{
+		String resultPage =mockMvc.perform(MockMvcRequestBuilders.post("/board/register")
+				.param("title","50기 전원 취업")
+				.param("content","축하합니다.")
+				.param("writer","홍길동")
+				).andReturn().getModelAndView().getViewName();
+		log.info(resultPage);
+	}
+	@Test
+	public void testGet() throws Exception
+	{
+		log.info(mockMvc.perform(MockMvcRequestBuilders.get("/board/get")
+				.param("bno","144"))
+				.andReturn()
+				.getModelAndView().getModelMap()
+				);
+	}
+
+	@Test
+	public void testUpdate() throws Exception
+	{
+		String resultPage =mockMvc.perform(MockMvcRequestBuilders.post("/board/modify")
+				.param("bno","126")
+				.param("title","50기 전원 취업_5")
+				.param("content","축하합니다_5.")
+				.param("writer","홍길동_5")
+				).andReturn().getModelAndView().getViewName();
+		log.info(resultPage);
+	}
+	*/
+	@Test
+	public void testDelete() throws Exception
+	{
+		log.info(mockMvc.perform(MockMvcRequestBuilders.get("/board/delete")
+				.param("bno","121"))
+				.andReturn()
+				.getModelAndView().getModelMap()
+				);
+	}	
+	
+	
+}
+
+
+
+Tip
+1. 서버에 오라클 설치하기
+버전 : oracle-xe-11.2.0-x86_64.rpm.zip
+unzip oracle*
+apt -y install alien libaio1 unixodbc
+cd /Disk1
+oracle-xe-11.2.0-1.0.x86_64.rpm
+alien --scripts -d oracle*
+dpkg --install oracle*.deb
+-----------------------------------------------------
+/etc/init.d/oracle-xe configure
+systemctl start oracle-xe
+nano /etc/bash.bashrc
+. /u01/app/oracle/product/11.2.0/xe/bin/oracle_env.sh
+mkdir /oradata
+-----------------------------------------------------
+2. 사용자추가
+데이터베이스 사용자 추가하기
+sqlplus / as system
+create user nonage identified by tiger;
+grant connect,resource to nonage;
+grant create view to nonage;
+imp system/123456 fromuser=nonage touser=nonage file=c:/backup.dmp
+3.BoardVO멤버변수정의와 패키지 네이밍
+com.jslhrd
+> config
+> controller
+> service
+> domain
+> persistence
+> exception
+> aop
+> security
+> util
+> mapper
+BoardVO 클래스만들기
+private Long bno;
+private String title;
+private String content;
+private String writer;
+private Date regdate;
+private Date updateDate;
+
+Tip2 에러모음
+에러 원인 : 
+org.springframework.jdbc.UncategorizedSQLException: 
+### Error querying database.  Cause: java.sql.SQLException: 실행할 SQL 문은 비어 있거나 널일 수 없음
+### The error may exist in com/jslhrd/mapper/BoardMapper.xml
+### The error may involve com.jslhrd.mapper.BoardMapper.getList
+### The error occurred while executing a query
+해결법 > 
+
+에러 원인:
+org.springframework.web.util.NestedServletException: Request processing failed; nested exception is java.lang.NullPointerException
+	org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:982)
+	org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:866)
+	javax.servlet.http.HttpServlet.service(HttpServlet.java:655)
+	org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:851)
+	javax.servlet.http.HttpServlet.service(HttpServlet.java:764)
+	org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+해결법 >
+
+에러 원인:
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'boardController' defined in file [C:\Users\master\Documents\workspace-sts-3.9.18.RELEASE\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\Spring31\WEB-INF\classes\com\jslhrd\controller\BoardController.class]: Unsatisfied dependency expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.jslhrd.service.BoardService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+해결법 >
+
+
+에러 원인:
+java.lang.NullPointerException
+	com.jslhrd.service.BoardServiceImpl.getList(BoardServiceImpl.java:17)
+	com.jslhrd.controller.BoardController.list(BoardController.java:21)
+해결법 >
+
+Tip 테이블 마무리하기
+p677 자동 로그인 테이블
+create table persistence_logins
+(
+  series varchar(64) primary key,
+  username varchar(64) not null,
+  token varchar(64) not null,
+  last_used timestamp not null
+);
+
+p651 인증/권한을 위한 테이블
+create table tbl_member(
+  userid varchar2(50) not null primary key,
+  userpw varchar2(100) not null,
+  username varchar2(100) not null,
+  regdate date default sysdate,
+  updateDate date default sysdate,
+  enabled char(1) default '1'
+);
+
+create table tbl_member_auth(
+  userid varchar2(50) not null,
+  auth varchar2(50) not null,
+  constraint fk_member_auth foreign key(userid) references tbl_member(userid)
+);
+
+
+p645 JDBC를 이용하기 위한 테이블
+create table users(
+  username varchar2(50) not null primary key,
+  password varchar2(50) not null,
+  enabled char(1) default '1'
+);
+
+insert into users(username,password) values('user00','123456');
+insert into users(username,password) values('member00','123456');
+insert into users(username,password) values('admin00','123456');
+
+create table authorities (
+  username varchar2(50) not null,
+  authority varchar(50) not null,
+  constraint fk_authorities_users foreign key(username) references users(username)
+);
+
+
+insert into authorities(username,authority) values('user00','ROLE_USER');
+insert into authorities(username,authority) values('member00','ROLE_MANAGER');
+insert into authorities(username,authority) values('admin00','ROLE_MANAGER');
+insert into authorities(username,authority) values('admin00','ROLE_MEMBER');
+insert into authorities(username,authority) values('admin00','ROLE_ADMIN');
+
+p377 댓글 테이블
+create sequence seq_reply;
+
+create table tbl_reply(
+  rno number(10,0),
+  bno number(10,0) not null,
+  reply varchar2(1000) not null,
+  replyer varchar2(50) not null,
+  replyDate date default sysdate,
+  updateDate date default sysdate
+);
+
+alter table tbl_reply add constraint pk_reply primary key(rno);
+alter table tbl_reply add constraint fk_reply_board foreign key(bno) references tbl_board(bno);
+
+
+p275 게시판 테이블
+create table tbl_board(
+  bno number(10,0),
+  title varchar2(200) not null,
+  content varchar2(2000) not null,
+  writer varchar2(50) not null,
+  regdate date default sysdate,
+  updatedate date default sysdate
+);
+alter table tbl_board add constraint pk_board primary key(bno);
+
+p480 테이블 수정
+alter table tbl_board add(replycnt number default 0);
+update tbl_board set replycnt = (select count(rno) from tbl_reply where tbl_reply.bno = tbl_board.bno);
+
+
+Tip CDATA
+<![CDATA[
+]]>
+
+Tip 테스트 코드1
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml"
+})
+@Log4j
+
+
+
+Tip 테스트 코드2
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import javax.sql.DataSource;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+	"file:src/main/webapp/WEB-INF/srping/security-context.xml"
+})
+@Log4j
+
+
+
+Tip 테스트 코드3(프레젠테이션 테스트 코드)
+package com.jslhrd.controller;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration({
+	"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+	"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
+})
+@Log4j
+
+public class BoardControllerTests {
+	
+	@Setter(onMethod_ = @Autowired)
+	private WebApplicationContext ctx;
+	private MockMvc mockMvc;
+	
+	@Before
+	public void setup()
+	{
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+	}
+	
+	
+	@Test
+	public void testList() throws Exception
+	{
+		log.info("^^");
+	}
+}
+
+Tip Filter
+	<filter>
+		<filter-name>encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>encoding</filter-name>
+		<servlet-name>appServlet</servlet-name>
+	</filter-mapping>
+
+Tip getListWIthPaging
+	<select id="getListWithPaging" resultType="com.jslhrd.domain.BoardVO">
+	<![CDATA[
+		select bno, title, content,writer,regdate,updatedate 
+                         from 
+                          (
+		      select  /*+INDEX_DESC(tbl_board pk_baord)*/
+                                    rownum rn, bno,title,content,writer,regdate,updatedate 
+                                 from 
+                                   tbl_board
+                                 where rownum <=20
+                          ) where rn > 10
+	]]>
+	</select>
+
+Tip ListPaing
+<div>
+   <c:if test="">
+     이전
+   </c:if>
+
+   <c:if test="null">
+     다음
+   </c:if>
+</div>
+
+Tip 검색
+<div>
+	<form action="/board/list" method="get">
+	<input type="hidden" name="pageNum" value="${pageMaker.cri.pageNum}">
+	<input type="hidden" name="amount" value="${pageMaker.cri.amount}">	
+		<select name='type'>
+			<option value="">--</option>
+			<option value="T">제목</option>
+		</select>
+		<input type="text" name="keyword">
+		<input type="submit">
+	</form>
+</div>
+
+
+Tip 자바스크립트 적용
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+   $().DataTable
+   });
+</script>
+
+<script type="text/javascript">
+	$(document)
+			.ready(
+					function() {
+
+						var result = '<c:out value="${result}"/>';
+
+						checkModal(result);
+
+						history.replaceState({}, null, null);
+
+						function checkModal(result) 
+
+							if (result === '' || history.state) {
+								return;
+							}
+
+							if (parseInt(result) > 0) {
+								$(".modal-body").html(
+										"게시글 " + parseInt(result)
+												+ " 번이 등록되었습니다.");
+							}
+
+							$("#myModal").modal("show");
+						}
+
+						$("#regBtn").on("click", function() {
+
+							self.location = "/board/register";
+
+						});
+
+						var actionForm = $("#actionForm");
+
+						$(".paginate_button a").on(
+								"click",
+								function(e) {
+
+									e.preventDefault();
+
+									console.log('click');
+
+									actionForm.find("input[name='pageNum']")
+											.val($(this).attr("href"));
+									actionForm.submit();
+								});
+
+						$(".move")
+								.on(
+										"click",
+										function(e) {
+
+											e.preventDefault();
+											actionForm
+													.append("<input type='hidden' name='bno' value='"
+															+ $(this).attr(
+																	"href")
+															+ "'>");
+											actionForm.attr("action",
+													"/board/get");
+											actionForm.submit();
+
+										});
+
+						var searchForm = $("#searchForm");
+
+						$("#searchForm button").on(
+								"click",
+								function(e) {
+
+									if (!searchForm.find("option:selected")
+											.val()) {
+										alert("검색종류를 선택하세요");
+										return false;
+									}
+
+									if (!searchForm.find(
+											"input[name='keyword']").val()) {
+										alert("키워드를 입력하세요");
+										return false;
+									}
+
+									searchForm.find("input[name='pageNum']")
+											.val("1");
+									e.preventDefault();
+
+									searchForm.submit();
+
+								});
+
+					});
+</script>
+
+
+
+
+
+
+MVC
+C(Views) / 2S(Controller service+serviceimpl) / MX(영속계층:데이터베이스 M)
+   
+
+모델1 html+jsp
+
+
+Tip
+Step0
+페이지 연결
+위치 > con.jslhrd.controller
+BoardController.java
+CommonController.java
+
+Tip xml파일 완정 정리
+[기존xml파일]
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jslhrd.mapper.BoardMapper">
+</mapper>
+
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jslhrd.mapper.BoardMapper">
+	<select id="getTime2" resultType="string">
+		SELECT sysdate from dual
+	</select>
+</mapper>
+페이지 작업
+
+Tip
+
+
+[추가된xml파일]
+p338~339
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jslhrd.mapper.BoardMapper">
+<select id="getListWithPaging">
+</select>
+<select id="getTotalCount">
+</select>
+<sql id="criteria">
+</sql>
+</mapper>
+
+Tip 도메인
+private Long rno;
+private Long bno;
+
+private String reply;
+private String replyer;
+private String replyDate;
+private String updateDate;
+
+
+
+
+
+Class T1
+{
+  public static void main(String[] argc)
+  {
+     System.out.println()
+  }
+}
+
+MVC (model, View(), Controller(service))
+MTV (model, Template, View(service))

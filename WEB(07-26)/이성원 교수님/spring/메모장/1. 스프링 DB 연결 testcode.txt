@@ -1,0 +1,510 @@
+// 스프링 DB 연결 및 테스트 코드
+
+new -> spring Legacy Project
+
+view 안에 board폴더와 include폴더 만들기
+board : 페이지 만들때마다 추가
+include :  main.jsp / header.jsp / fooder.jsp
+
+src/main/java안에 kr.jeonjucom에 controller, domain, mapper, service 패키지로 만들고 src/test/java안에도 패키지 똑같이만들기 (별개로 추가 persistence)
+
+controller = 서블릿 생각하기
+domain = VO 만들기
+mapper = 
+service =
+persistence = DB연결
+----------------------------------------------------------------------------------------------------
+1. pom.xml 수정하기
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.jikong01</groupId> <!-- 여기 수정 본인 도메인-->
+	<artifactId>controller</artifactId> <!-- controller -->
+	<name>ex05</name>
+	<packaging>war</packaging>
+	<version>1.0.0-BUILD-SNAPSHOT</version>
+
+	<properties>
+		<java-version>1.11</java-version> <!-- 여기 수정 1.11-->
+		<org.springframework-version>5.0.7.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.9.0</org.aspectj-version>
+		<org.slf4j-version>1.7.25</org.slf4j-version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework-version}</version>
+			<exclusions>
+				<!-- Exclude Commons Logging in favor of SLF4j -->
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		
+		
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>2.7.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.4.6</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4 -->
+		<dependency>
+			<groupId>org.bgee.log4jdbc-log4j2</groupId>
+			<artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+			<version>1.16</version>
+		</dependency>		
+
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+			</exclusions>
+			<!-- <scope>runtime</scope> -->
+		</dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.28</version> <!-- 여기 수정 -->
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+
+
+	<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+	<dependency>
+		<groupId>org.quartz-scheduler</groupId>
+		<artifactId>quartz</artifactId>
+		<version>2.3.0</version>
+	</dependency>
+
+
+	<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz-jobs -->
+	<dependency>
+		<groupId>org.quartz-scheduler</groupId>
+		<artifactId>quartz-jobs</artifactId>
+		<version>2.3.0</version>
+	</dependency>
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-web</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-config</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-core</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-taglibs</artifactId>
+    <version>5.0.7.RELEASE</version>
+</dependency>
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>11</source> <!-- 여기 수정 1.11(그냥 11도 가능)-->
+					<target>11</target> <!-- 여기 수정 1.11(그냥 11도 가능)-->
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<mainClass>org.test.int1.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+------------------------------------------------------------------------------------------------
+
+spring 우클릭 -> Propert 들어간 후 -> javaBuild Path -> mysql 추가해 줘라(jar 파일)
+spring 우클릭 -> Propert 들어간 후 -> Deployment Assembly -> mysql 추가해 줘라(jar 파일)
+
+------------------------------------------------------------------------------------------------
+root - context.xml 수정하기
+	
+<?xml version="1.0" encoding="UTF-8"?>
+		<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!--Root Context: defines shared resources visible to all other web components -->
+		<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<!--
+		<property name="driverClassName"
+			value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		-->
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver"></property> <!-- 여기 수정 -->
+		<property name="jdbcUrl"
+			value="jdbc:mysql://192.168.0.45:3306/master"></property> !-- 여기 수정 (지워주세요 제발)--
+		<property name="username" value="master"></property> <!-- 여기 수정 -->
+		<property name="password" value="123456"></property> <!-- 여기 수정 -->
+
+	</bean>
+
+	<!-- HikariCP configuration -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<mybatis-spring:scan
+		base-package="com.jikong01.mapper" /> <!-- 여기 수정 (본인도메인)-->
+
+	<context:component-scan
+		base-package="com.jikong01.service"></context:component-scan>	<!-- 여기 수정 (본인도메인)-->
+</beans>
+
+----------------------------------------------------------------------------------------------------------------
+
+src/test/java 안에 kr.jeonjucom. 에서 persistence 패키지 만들고 JDBCTests.java 만들기
+
+[JDBCTests]
+package kr.jeonjucom.persistence; <!-- 실무 나가면 패키지 변경되니 참고 해 주세요 -->
+
+import static org.junit.Assert.fail;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import org.junit.Test;
+import lombok.extern.log4j.Log4j;
+
+@Log4j
+public class JDBCTests {
+      private String Driver = "com.mysql.cj.jdbc.Driver";
+      private String url = "jdbc:mysql://192.168.0.45:3306/master";
+      private String user = "master";
+      private String password = "123456";
+      Connection conn = null;
+      
+      static{
+         try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+         }catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+         }
+      }
+         
+      @Test
+      public void testConnection() {
+         try(Connection conn = DriverManager.getConnection(url, user, password)){  
+            log.info(conn);
+         }catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+         }
+   }
+}
+
+----------------------------------------------------------------------------------------------------------------
+
+src/test/java 안에 kr.jeonjucom.persistence안에 DataSourceTests.java 만들기
+
+[DataSourcetests]
+package kr.jeonjucom.persistence; <!-- 실무 나가면 패키지 변경되니 참고 해 주세요 -->
+
+import static org.junit.Assert.fail;
+import java.sql.Connection;
+import javax.sql.DataSource;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@Log4j
+public class DataSourceTests {
+   @Setter(onMethod_ = {@Autowired})
+   private DataSource dataSource;
+   
+    @Test
+    public void testConnection() {
+       try(Connection conn = dataSource.getConnection()){  
+          log.info(conn);
+       }catch (Exception e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+       }
+ }
+}
+
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+여기부터 test페이지 작업입니다↓
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+
+그리고 root - context.xml 파일 좌측하단에 namespaces 클릭 후 ->
+beans / context / jdbc / mybatis 체크표시 하기
+
+--------------------------------------------------------------------------------------------------------------------
+
+src/main/resouerces 안에 kr.jeonjucom.mapper파일만들고 [BoardMapper.xml]만들기 // (쿼리문)
+
+[BoardMapper.xml]
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.jeonjucom.mapper.BoardMapper">
+<select id="selectAllBoards" resultType="kr.jeonjucom.domain.BoardVO">
+<![CDATA[
+   select * from board where idx > 0
+]]>
+</select>
+<insert id="InsertBoard">
+insert into board(idx, name, subject, content, regdate, hit, ip) 
+values(#{idx}, #{name}, #{subject}, #{content}, #{regdate}, #{hit}, #{ip})
+</insert>
+
+<select id="SelectOneBoardByNum" resultType="kr.jeonjucom.domain.BoardVO">
+   select * from board where idx = #{idx}
+</select>
+<delete id = "deleteBoard">
+delete from board where idx = #{idx}
+</delete>
+<update id ="updateBoard">
+update board set name = #{name}, subject = #{subject}, content = #{content} where idx = #{idx}
+</update>
+<select id="getListWithPaging">
+</select>
+<select id="getTotalCount">
+</select>
+<sql id="criteria">
+</sql>
+</mapper>
+
+--------------------------------------------------------------------------------------------------------------------
+
+src/main/java 안에 com.jikong01.domain안에 [BoardVO]만들기
+
+package com.jikong01.domain;
+
+import lombok.Data;
+
+@Data
+public class BoardVO {
+   private int idx;
+   private String name;
+   private String subject;
+   private String content;
+   private String regdate;
+   private int hit;
+   private String ip;
+}

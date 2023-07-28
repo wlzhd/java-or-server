@@ -1,0 +1,156 @@
+SERVICE 및 MAPPER 만들기
+
+src/test/java 안에
+com.jikong01.mapper 패키지 안에
+BoardMapperTests.java 만들기
+
+[BoardMapperTests]
+
+package com.jikong01.mapper;
+
+import java.util.ArrayList;
+import com.jikong01.domain.BoardVO;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@Log4j
+public class BoardMapperTests {
+   @Setter(onMethod_ = {@Autowired})
+   private BoardMapper mapper;
+
+   @Test
+   public void testSelectAllBoards() {
+      mapper.selectAllBoards().forEach(board -> log.info(board));
+   }
+/*
+   @Test
+   public void testinsertBoard() {
+      BoardVO bVo = new BoardVO();
+      bVo.setIdx(33);
+      bVo.setName("주일권");
+      bVo.setSubject("연습");
+      bVo.setContent("연습");
+      bVo.setRegdate("2023-01-01");
+      bVo.setHit(1);
+      bVo.setIp("172.0.0.2");
+      mapper.InsertBoard(bVo);
+      log.info("asdfsadgdsagasds");
+   }
+   
+   @Test
+   public void testSelectOneBoardByNum() {
+      BoardVO bVo = mapper.SelectOneBoardByNum(32);
+      log.info(bVo);
+   }
+   
+   @Test
+      public void testDeleteBoard() {
+         mapper.deleteBoard(31);
+      }
+     
+      @Test
+      public void testUpdateBoard() {
+         BoardVO bVo = new BoardVO();
+         bVo.setIdx(29);
+         bVo.setName("이광민");
+         bVo.setSubject("너의 이야기");
+         bVo.setContent("너의 이야기");
+         mapper.updateBoard(bVo);
+         log.info(bVo);
+      }*/
+     
+}
+
+------------------------------------------------------------------------------------------------------------
+
+src/main/java 안에
+먼저 만들어 놓은 com.jikong01.mapper 패키지안에
+BoardMapper.java(인터페이스) / BoardMapperImpl.java 만들기
+
+[BoardMapper]
+
+package com.jikong01.mapper;
+
+import java.util.ArrayList;
+import com.jikong01.domain.BoardVO;
+
+public interface BoardMapper {
+
+	   //@Select("select * from board where idx > 0")
+	   public ArrayList<BoardVO> selectAllBoards();
+	   public void InsertBoard(BoardVO bVo);
+	   public BoardVO SelectOneBoardByNum(int i);
+}
+
+------------------------------------------------------------------------------------------------------------
+
+[BoardMapperImpl]
+
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+src/test/java 안에
+com.jikong01.service 패키지 안에
+BoardServiceTests.java 만들기
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------
+src/main/java 안에
+먼저 만들어 놓은 com.jikong01.service 패키지안에
+BoardService.java(인터페이스) / BoardServiceImpl.java 만들기
+
+[BoardService]
+
+package com.jikong01.service;
+
+import java.util.ArrayList;
+import com.jikong01.domain.BoardVO;
+
+public interface BoardService {
+	
+	//p199
+	public ArrayList<BoardVO> selectAllBoards();
+	
+	
+}
+------------------------------------------------------------------------------------------------------------
+
+[BoardServiceImpl]
+
+package com.jikong01.service;
+
+import java.util.ArrayList;
+import org.springframework.stereotype.Service;
+import com.jikong01.domain.BoardVO;
+import com.jikong01.mapper.BoardMapper;
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class BoardServiceImpl implements BoardService{
+	
+	// p200
+	private BoardMapper mapper;
+	
+	@Override
+	public ArrayList<BoardVO> selectAllBoards() {
+		return mapper.selectAllBoards();
+	}
+
+}
+------------------------------------------------------------------------------------------------------------
+
+
