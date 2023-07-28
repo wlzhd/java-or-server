@@ -1,0 +1,6 @@
+model2
+MVC
+View -> jsp -> 태그 ${}
+서블릿 -> Controller 역할(○, ㅁ, △ 생각하기)
+dto = vo / dao = dao(존나 중요한 역할 / ㅁ가 추가되면 dao도 추가해줘야 함)
+

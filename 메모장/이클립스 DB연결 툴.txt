@@ -1,0 +1,28 @@
+package util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBManager {
+	public static String DRIBER = "com.mysql.cj.jdbc.Driber";
+	public static String URL = "jdbc:mysql://15.164.218.36:3306/MEMBERKJS"; // <- 변경될 수 있음
+	public static String USER = "userKJS"; // <- 변경될 수 있음
+	public static String PASS = "p@ssw0rd"; // <- 변경될 수 있음
+----------------------------------------------고정----------------------------------------------
+	public static Connection getConn() {
+		Connection conn = null;
+		try {
+			Class.forName(DRIBER);
+			conn = DriverManager.getConnection(URL,USER,PASS);
+		}catch (ClassNotFoundException e) {
+			System.out.println("다라이버 오류> " + e);
+		}catch (SQLException e) {
+			System.out.println("DB 접속 오류 > " + e);
+		}
+		return null;
+	}
+	
+	
+}
+
