@@ -508,3 +508,67 @@ public class BoardVO {
    private int hit;
    private String ip;
 }
+-------------------------------------------------------------------------------------------------------------------
+(실질적인 친구)
+src/test/java 에서 mapper안에 [BoardMapperTests].java로 만들기
+
+package kr.jeonjucom.mapper;
+
+import java.util.ArrayList;
+import kr.jeonjucom.domain.BoardVO;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@Log4j
+public class BoardMapperTests {
+   @Setter(onMethod_ = {@Autowired})
+   private BoardMapper mapper;
+   /*
+   @Test
+   public void testSelectAllBoards() {
+      mapper.selectAllBoards().forEach(board -> log.info(board));
+   }*/
+   /*
+   @Test
+   public void testinsertBoard() {
+      BoardVO bVo = new BoardVO();
+      bVo.setIdx(38);
+      bVo.setName("주일권");
+      bVo.setSubject("연습");
+      bVo.setContent("연습");
+      bVo.setRegdate("2023-01-01");
+      bVo.setHit(1);
+      bVo.setIp("172.0.0.2");
+      mapper.InsertBoard(bVo);
+      log.info("asdfsadgdsagasds");
+   }*/
+   /*@Test
+   public void testSelectOneBoardByNum() {
+      BoardVO bVo = mapper.SelectOneBoardByNum(32);
+      log.info(bVo);
+   }*/
+   /*
+   @Test
+      public void testDeleteBoard() {
+         mapper.deleteBoard(31);
+      }*/
+     /*
+      @Test
+      public void testUpdateBoard() {
+         BoardVO bVo = new BoardVO();
+         bVo.setIdx(29);
+         bVo.setName("이광민");
+         bVo.setSubject("너의 이야기");
+         bVo.setContent("너의 이야기");
+         mapper.updateBoard(bVo);
+         log.info(bVo);
+      }
+      */
+}
