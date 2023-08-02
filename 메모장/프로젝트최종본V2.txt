@@ -1,0 +1,513 @@
+
+#외부접속허용
+create user master@14.55.194.178 identified by '123456';
+grant all on master.* to master@14.55.194.178;
+flush privileges;
+#XML설정
+1) 기본
+pom.xml > root-context.xml 설정
+root-context.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+		<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+
+		<property name="driverClassName"
+			value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl"
+			value="jdbc:mysql://jeonjucom.kr:3330/master"></property>
+		<property name="username" value="master"></property>
+		<property name="password" value="123456"></property>
+
+	</bean>
+
+	<!-- HikariCP configuration -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<mybatis-spring:scan
+		base-package="kr.jeonjucom.mapper" />
+
+	<context:component-scan
+		base-package="kr.jeonjucom.service"></context:component-scan>	
+	
+</beans>
+
+2) 업로드설정
+servlet-context.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<context:component-scan base-package="kr.jeonjucom.controller" />
+	
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="defaultEncoding" value="utf-8"></beans:property>
+	</beans:bean>
+	
+	<context:component-scan base-package="kr.jeonjucom.exception"></context:component-scan>
+	<context:component-scan base-package="kr.jeonjucom.controller"></context:component-scan>
+</beans:beans>
+
+#데이터베이스연결확인(test코드)
+JDBCTests.java
+package kr.jeonjucom.persistence;
+
+import static org.junit.Assert.fail;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+import org.junit.Test;
+
+import lombok.extern.log4j.Log4j;
+@Log4j
+public class JDBCTests {
+	
+	static {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	String url = "jdbc:mysql://jeonjucom.kr:3330/master";
+	String user="master";
+	String password="123456";
+	
+	@Test
+	public void testConnection() {
+		try(Connection conn =
+				DriverManager.getConnection(url, user, password)) {
+			log.info(conn);
+			
+		}catch(Exception e) {
+			fail(e.getMessage());
+	}
+	
+	}
+}
+
+
+DataSourceTests.java
+package kr.jeonjucom.persistence;
+
+import static org.junit.Assert.fail;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+import org.junit.Test;
+
+import lombok.extern.log4j.Log4j;
+@Log4j
+public class JDBCTests {
+	
+	static {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	String url = "jdbc:mysql://jeonjucom.kr:3330/master";
+	String user="master";
+	String password="123456";
+	
+	@Test
+	public void testConnection() {
+		try(Connection conn =
+				DriverManager.getConnection(url, user, password)) {
+			log.info(conn);
+			
+		}catch(Exception e) {
+			fail(e.getMessage());
+	}
+	
+	}
+}
+
+
+
+#테스트코드작성후 확인(확인하면 좋아요!)
+[mapper]
+package kr.jeonjucom.mapper;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import kr.jeonjucom.domain.BoardVO;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@Log4j
+
+public class BoardMapperTests {
+
+	@Setter(onMethod_ = @Autowired)
+	private BoardMapper mapper;
+	/*
+	@Test
+	public void testGetList() {
+		mapper.getList().forEach(board->log.info(board));
+		
+	}
+
+	@Test
+	public void testInsert() {
+		BoardVO bVo = new BoardVO();
+		bVo.setName("홍길동");
+		bVo.setSubject("연습");
+		bVo.setContent("연습");
+		bVo.setRegdate("2023-08-01");		
+		bVo.setIp("127.0.0.1");	
+		bVo.setHit(1);			
+		mapper.insert(bVo);
+		log.info(bVo);
+		
+	}	
+		
+	@Test
+	public void testInsertSelectKey() {
+		BoardVO bVo = new BoardVO();
+		bVo.setName("홍길동");
+		bVo.setSubject("새로 작성하는 글 select key");
+		bVo.setContent("연습");
+		bVo.setRegdate("2023-08-01");		
+		bVo.setIp("127.0.0.1");	
+		bVo.setHit(1);			
+		mapper.insertSelectKey(bVo);
+		log.info(bVo);
+		
+	}
+	*/
+	@Test
+	public void testRead() {
+		BoardVO bVo = mapper.read(1L);
+		log.info(bVo);
+	}
+}
+[service]
+package kr.jeonjucom.service;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import kr.jeonjucom.domain.BoardVO;
+import kr.jeonjucom.mapper.BoardMapperTests;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+@Log4j
+
+public class BoardServiceTests {
+	
+	@Setter(onMethod_ = {@Autowired})
+	private BoardService service;
+	/*
+	@Test
+	public void testGetList() {
+		service.getList().forEach(board -> log.info(board));
+		
+	}
+	
+	@Test
+	public void testRegister() {
+		BoardVO bVo = new BoardVO();
+		bVo.setSubject("연습");
+		bVo.setContent("연습");
+		bVo.setName("홍길동");
+		bVo.setRegdate("2023-08-01");
+		bVo.setHit(1);
+		bVo.setIp("127.0.0.1");		
+		service.register(bVo);
+		log.info("생성된 게시물의 번호"+bVo.getIdx());
+		
+	}	
+	*/
+	@Test
+	public void testGet() {
+		log.info(service.get(1L));
+	}
+
+}
+[controller]
+package kr.jeonjucom.controller;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@WebAppConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
+})
+@Log4j
+public class BoardControllerTests {
+	
+	@Setter(onMethod_ = {@Autowired})
+	private WebApplicationContext ctx;
+	
+	private MockMvc mockMvc;
+	
+	@Before
+	public void setup() {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+	}
+	
+
+	@Test
+	public void testList() throws Exception {
+		log.info(
+				mockMvc.perform(MockMvcRequestBuilders.get("/board/list"))
+				.andReturn()
+				.getModelAndView()
+				.getModelMap()
+		);
+		
+	}
+	
+	@Test
+	public void testGet() throws Exception {
+		log.info(
+				mockMvc.perform(MockMvcRequestBuilders.get("/board/get")
+				.param("idx","1"))
+				.andReturn()
+				.getModelAndView().getModelMap()
+		);
+		
+	}
+
+}
+
+#영속계층
+VO만들기
+package kr.jeonjucom.domain;
+import lombok.Data;
+
+@Data
+public class BoardVO {
+	private long idx;
+	private String name;
+	private String subject;
+	private String content;
+	private String regdate;
+	private int hit;
+	private String ip;
+
+}
+
+Mapper만들기(I)
+package kr.jeonjucom.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Select;
+import kr.jeonjucom.domain.BoardVO;
+
+public interface BoardMapper {
+	//@Select("SELECT * from board where idx > 0 ")
+	public List<BoardVO> getList();
+
+	public void insertSelectKey(BoardVO bVo);
+	public void insert(BoardVO bVo);
+	public BoardVO read(Long idx);
+}
+
+XML 만들기
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.jeonjucom.mapper.BoardMapper">
+
+<select id="getList" resultType="kr.jeonjucom.domain.BoardVO">
+<![CDATA[
+	select * from board where idx > 0 order by idx desc
+]]>
+</select>
+<select id="read" resultType="kr.jeonjucom.domain.BoardVO">
+	select * from board where idx = #{idx}
+</select>
+<insert id="insert">
+	insert into board(idx,name,subject,content,regdate,hit,ip) values(#{idx},#{name},#{subject},#{content},#{regdate},#{hit},#{ip})
+</insert>
+<insert id="insertSelectKey">
+	<selectKey keyProperty="idx" order="BEFORE" resultType="long">
+		select MAX(idx) + 1 from board
+	</selectKey>
+insert into board(idx,name,subject,content,regdate,hit,ip) values(#{idx},#{name},#{subject},#{content},#{regdate},#{hit},#{ip})
+</insert>
+</mapper>
+
+#서비스계층
+Service(I)
+package kr.jeonjucom.service;
+
+import java.util.List;
+
+import kr.jeonjucom.domain.BoardVO;
+
+public interface BoardService {
+	public List<BoardVO> getList();
+	public void register(BoardVO bVo);
+	public BoardVO get(Long idx);
+}
+ServiceImpl
+package kr.jeonjucom.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.jeonjucom.domain.BoardVO;
+import kr.jeonjucom.mapper.BoardMapper;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j;
+
+@Service
+@AllArgsConstructor
+@Log4j
+public class BoardServiceImpl implements BoardService {
+	private BoardMapper mapper;
+	
+	@Override
+	public List<BoardVO> getList() {
+		return mapper.getList();
+	}
+
+	@Override
+	public void register(BoardVO bVo) {
+		log.info("register"+bVo);
+		mapper.insertSelectKey(bVo);
+		
+	}
+	
+	@Override
+	public BoardVO get(Long idx) {
+		log.info("get"+idx);
+		return mapper.read(idx);
+		
+	}	
+	
+}
+
+
+#화면계층
+Controller
+
+package kr.jeonjucom.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.jeonjucom.domain.BoardVO;
+import kr.jeonjucom.service.BoardService;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j;
+
+@Controller
+@RequestMapping("/board/*")
+@Log4j
+@AllArgsConstructor
+public class BoardController {
+	
+	private BoardService service;
+	
+	@GetMapping("/list")
+	public void list(Model model) {
+		log.info("/board/list");
+		model.addAttribute("list",service.getList());
+		
+	}
+	
+	@GetMapping("/register")
+	public void register() {
+		log.info("/board/register");
+		
+	}
+	
+	@PostMapping("/register")
+	public String register(BoardVO bVo, RedirectAttributes rttr) {
+		log.info("register: "+bVo);
+		
+		bVo.setIp("127.0.0.1");
+		bVo.setHit(1);
+		bVo.setRegdate("2023-08-01");
+		
+		service.register(bVo);
+		rttr.addFlashAttribute("result",bVo.getIdx());
+		return "redirect:/board/list";
+		
+	}	
+	
+	@GetMapping("/get")
+	public void get(@RequestParam("idx") Long idx,Model model) {
+		log.info("get");
+		model.addAttribute("board",service.get(idx));
+		
+	}	
+}
