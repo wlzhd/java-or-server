@@ -317,54 +317,54 @@ spring 우클릭 -> Propert 들어간 후 -> javaBuild Path -> mysql 추가해 �
 spring 우클릭 -> Propert 들어간 후 -> Deployment Assembly -> mysql 추가해 줘라(jar 파일)
 
 ------------------------------------------------------------------------------------------------
-root - context.xml 수정하기
-	
+root - context.xml 수정하기 / 1번과 2번 2중 하나만 사용하기
+(1)
 <?xml version="1.0" encoding="UTF-8"?>
-		<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
-	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
-		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
-		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
-	
-	<!--Root Context: defines shared resources visible to all other web components -->
-		<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-		<!--
-		<property name="driverClassName"
-			value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
-		-->
-		<property name="driverClassName"
-			value="com.mysql.cj.jdbc.Driver"></property> <!-- 여기 수정 -->
-		<property name="jdbcUrl"
-			value="jdbc:mysql://192.168.0.45:3306/master"></property> !-- 여기 수정 (지워주세요 제발)--
-		<property name="username" value="master"></property> <!-- 여기 수정 -->
-		<property name="password" value="123456"></property> <!-- 여기 수정 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+   xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+   xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+      http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+      http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+   
+   <!-- Root Context: defines shared resources visible to all other web components -->
+   <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+      <!-- 
+      <property name="driverClassName"
+         value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+      -->
+      <property name="driverClassName"
+         value="com.mysql.cj.jdbc.Driver"></property>
+      <property name="jdbcUrl"
+         value="jdbc:mysql://192.168.0.44:3306/master"></property>
+      <property name="username" value="master"></property>
+      <property name="password" value="123456"></property>
 
-	</bean>
+   </bean>
 
-	<!-- HikariCP configuration -->
-	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
-		destroy-method="close">
-		<constructor-arg ref="hikariConfig" />
-	</bean>
+   <!-- HikariCP configuration -->
+   <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+      destroy-method="close">
+      <constructor-arg ref="hikariConfig" />
+   </bean>
 
-	<bean id="sqlSessionFactory"
-		class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource"></property>
-	</bean>
+   <bean id="sqlSessionFactory"
+      class="org.mybatis.spring.SqlSessionFactoryBean">
+      <property name="dataSource" ref="dataSource"></property>
+   </bean>
 
-	<mybatis-spring:scan
-		base-package="com.jikong01.mapper" /> <!-- 여기 수정 (본인도메인)-->
+   <mybatis-spring:scan
+      base-package="com.jj.app.mapper" />
 
-	<context:component-scan
-		base-package="com.jikong01.service"></context:component-scan>	<!-- 여기 수정 (본인도메인)-->
+   <context:component-scan
+      base-package="com.jj.app.service"></context:component-scan>   
 </beans>
 
 ----------------------------------------------------------------------------------------------------------------
-
+(2)
 src/test/java 안에 kr.jeonjucom. 에서 persistence 패키지 만들고 JDBCTests.java 만들기
 
 [JDBCTests]
@@ -404,7 +404,7 @@ public class JDBCTests {
    }
 }
 
-----------------------------------------------------------------------------------------------------------------
+===========================================================================================================
 
 src/test/java 안에 kr.jeonjucom.persistence안에 DataSourceTests.java 만들기
 
