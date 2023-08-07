@@ -363,8 +363,44 @@ root - context.xml 수정하기 / 1번과 2번 2중 하나만 사용하기
       base-package="com.jj.app.service"></context:component-scan>   
 </beans>
 
-----------------------------------------------------------------------------------------------------------------
+///////////////////////////////////////////////////////////////////////////////////
 (2)
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:mvc="http://www.springframework.org/schema/mvc"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:tx="http://www.springframework.org/schema/tx"
+      xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+      http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+   
+   <!-- Root Context: defines shared resources visible to all other web components -->
+   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <!--property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property-->
+      <!--property name="url" value="jdbc:log4jdbc:mysql://localhost:3306/springbasic?useUnicode=true&amp;characterEncoding=utf8"></property-->
+      <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+      <property name="url" value="jdbc:mysql://192.168.0.44:3306/master?useUnicode=true&amp;characterEncoding=utf8"></property>
+      <property name="username" value="master"></property>
+      <property name="password" value="123456"></property>
+   </bean>
+   <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+      <property name="dataSource" ref="dataSource"/>
+      <property value="classpath:mybatis-config.xml" name="configLocation"/> <!-- 여기 부분 수정했음 -->
+      <property value="classpath:sql/*Map.xml" name="mapperLocations"/>
+   </bean>
+   <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+      <constructor-arg ref="sqlSessionFactory"/>
+   </bean>
+      <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <property name="dataSource" ref="dataSource"/>
+   </bean>
+   <tx:annotation-driven/>
+   <context:component-scan base-package="kr.sem.java"/> <!-- 최상위 패키지 넣어주기 -->
+</beans>
+
+
+----------------------------------------------------------------------------------------------------------------
 src/test/java 안에 kr.jeonjucom. 에서 persistence 패키지 만들고 JDBCTests.java 만들기
 
 [JDBCTests]
