@@ -5,11 +5,13 @@
 <html>
 <head>
 <style>
+
 </style>
 </head>
 <body id="bd" onload="getTime()">
 	<div class="search-container">
-		<form action="<c:url value="/"/>" name="searchForm" method="GET">
+		<form action="<c:url value="/"/>" name="searchForm"
+			method="GET">
 			<div class="search-container">
 				<select name="option" id="option">
 					<option value="s_mname">메뉴이름</option>
@@ -21,15 +23,15 @@
 				</a>
 			</div>
 			<div class="left-side-image">
-				<!-- <a href="http://jeonjucom.kr:8031" target="_blank"> -->
-				<a href="http://192.168.0.31" target="_blank"> <img
-					src="/upload/zzzz.png" alt="Left Image">
+				<a href="http://jeonjucom.kr:8031" target="_blank">
+				<!-- <a href="http://192.168.0.31" target="_blank"> --> <img
+					src="/resources/img/zzzz.png" alt="Left Image">
 				</a>
 			</div>
 			<div class="right-side-image">
-				<!-- <a href="http://jeonjucom.kr:8041" target="_blank"> -->
-				<a href="http://192.168.0.41" target="_blank"> <img
-					src="/upload/qqqq.png" alt="Right Image">
+				<a href="http://jeonjucom.kr:8041" target="_blank">
+				<!-- <a href="http://192.168.0.41" target="_blank"> --> <img
+					src="/resources/img/qqqq.png" alt="Right Image">
 				</a>
 			</div>
 
@@ -41,8 +43,9 @@
 							<div class="popup-trigger">
 								<input type="hidden" class="${bno.s_mno}" id="s_mno"
 									value="${bno.s_mno}"> <img
-									src="${pageContext.request.contextPath}/upload/${bno.s_refname}"
-									alt="Image" class="auto-size">
+									<%-- src="${pageContext.request.contextPath}/upload/${bno.s_refname}" alt="Image" --%>
+									src="/resources/img/${bno.s_refname}" alt="Image"
+									class="auto-size">
 								<div class="image-text">${bno.s_mname}</div>
 							</div>
 						</c:forEach>
@@ -59,8 +62,9 @@
 						<div class="modal-text" style="font-size: 25px;">
 							<p id="WhatTimeIsItNow"></p>
 							<hr style="border: solid 2px;">
-							웨이팅 : <span id="demo"></span><span style="margin-left: 150px;">
-								남은자리 : <span id="remainingSeats"></span>
+							웨이팅 : <span id="demo"></span><span
+								style="margin-left: 150px;"> 남은자리 : <span
+								id="remainingSeats"></span>
 							</span>
 							<hr style="border: solid 2px;">
 							메뉴판
@@ -90,10 +94,9 @@
 			</div>
 		</form>
 	</div>
-	<script>
+   <script>
 /*===========================================건들면 진짜 죽임===========================================*/
       var result1 = "";
-     
          function getTime() {            
 
                     var d = new Date();   // 현재 날짜와 시간
@@ -122,7 +125,7 @@
       var closePopupButton = document.getElementById("closePopupButton");
       var popup = document.getElementById("popup");
       var popupImage = popup.querySelector("img");
-      
+
 
       var imageUrls = [
 <%--    <%for (int i = 1; i <= 20; i++) { --%>
@@ -137,9 +140,7 @@
            trigger.addEventListener("click", function() {
 //                var clickedImage = this.querySelector("img");
 //                popupImage.src = clickedImage.src;
-				popup.style.display = "block";
-				$('.center-column').addClass("show");
-				//document.querySelector(".center-column").classList.add = "show";
+                popup.style.display = "block";
             
                //let smno = document.getElementById('s_mno').value;
                let smno = this.querySelector('input').value;
@@ -186,7 +187,6 @@
                 
                 // 웨이팅 등록 시간 + 웨이팅 시간
                 //endTime = sinserttime + stime;
-                //console.log(value);
                 var earlierTimeParts = value.s_inserttime.split(":");
                 var laterTimeParts = value.s_time.split(":");
                 
@@ -251,7 +251,7 @@
                                divEl1.setAttribute("class", "modal-image-box");
                                
                                var img = document.createElement('img');
-                               img.setAttribute("src", "/upload/"+value.s_refname);
+                               img.setAttribute("src", "/resources/img/"+value.s_refname);
                                img.setAttribute("class", "popup-image");
                                divEl1.insertAdjacentElement("beforeend", img);
                                
@@ -267,7 +267,7 @@
                                  var tdEl_2 = document.createElement('td');
                                  var tdEl_3 = document.createElement('td');
                                  var img = document.createElement('img');
-                                 img.setAttribute("src", "/upload/"+value.s_refname);
+                                 img.setAttribute("src", "/resources/img/"+value.s_refname);
                                  
                                  var menuTitle = document.createElement('div');
                                  menuTitle.className = 'menu-title';
@@ -293,23 +293,21 @@
                });
          });
       }) 
-      /* 모달창 닫기 기능 */
-      closePopupButton.addEventListener("click", function() { 
+      
+    
+      closePopupButton.addEventListener("click", function() { /* 모달창 닫기 기능 */
          popup.style.display = "none";
          result1="";
          document.getElementById("demo").innerHTML = result1;
-         $('.center-column').removeClass("show");
-//          document.querySelector(".center-column").classList.remove = "show";
       }); 
       
-      /* 모달창 ESC로 닫기 기능 */
-      window.addEventListener("keydown", function(event) {   
+      window.addEventListener("keydown", function(event) {   /* 모달창 ESC로 닫기 기능 */
          if (event.key === "Escape") {
-        	 closePopupButton.click(); // closePopupButton의 클릭 이벤트를 강제로 발생시킴
+            popup.style.display = "none";
          }
       });
       
-      
+
       function formSubmit(){
          console.log(111);
          $('#searchForm').submit();
