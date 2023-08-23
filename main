@@ -1,0 +1,319 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jstl/core_rt" prefix="c"%><%--JSTL 문법 사용 --%>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+</head>
+<body id="bd" onload="getTime()">
+	<div class="search-container">
+		<form action="<c:url value="/"/>" name="searchForm" method="GET">
+			<div class="search-container">
+				<select name="option" id="option">
+					<option value="s_mname">메뉴이름</option>
+					<option value=""></option>
+				</select> <input type="text" name="keyword" value=""> <a
+					href="javascript:formSubmit();" onclick="formSubmit();"
+					class="btn_search">
+					<button id="search">검색</button>
+				</a>
+			</div>
+			<div class="left-side-image">
+				<!-- <a href="http://jeonjucom.kr:8031" target="_blank"> -->
+				<a href="http://192.168.0.31" target="_blank"> <img
+					src="/upload/zzzz.png" alt="Left Image">
+				</a>
+			</div>
+			<div class="right-side-image">
+				<!-- <a href="http://jeonjucom.kr:8041" target="_blank"> -->
+				<a href="http://192.168.0.41" target="_blank"> <img
+					src="/upload/qqqq.png" alt="Right Image">
+				</a>
+			</div>
+
+			<div class="container">
+				<div class="left-column">
+					<!-- 왼쪽 컨텐츠 -->
+					<div class="image-container">
+						<c:forEach var="bno" items="${mList}">
+							<div class="popup-trigger">
+								<input type="hidden" class="${bno.s_mno}" id="s_mno"
+									value="${bno.s_mno}"> <img
+									src="${pageContext.request.contextPath}/upload/${bno.s_refname}"
+									alt="Image" class="auto-size">
+								<div class="image-text">${bno.s_mname}</div>
+							</div>
+						</c:forEach>
+					</div>
+				</div>
+			</div>
+
+			<div class="center-column">
+				<!-- 가운데 컨텐츠 -->
+				<div id="popup" class="popup">
+					<div class="popup-content">
+						<button id="closePopupButton"></button>
+						<div class="modal-image"></div>
+						<div class="modal-text" style="font-size: 25px;">
+							<p id="WhatTimeIsItNow"></p>
+							<hr style="border: solid 2px;">
+							웨이팅 : <span id="demo"></span><span style="margin-left: 150px;">
+								남은자리 : <span id="remainingSeats"></span>
+							</span>
+							<hr style="border: solid 2px;">
+							메뉴판
+							<table class="menu-table">
+
+							</table>
+						</div>
+						<hr>
+					</div>
+				</div>
+			</div>
+			<div class="boardPaging">
+				<c:if test="${totalCnt!=null && totalCnt!=0}">
+					<c:if test="${ph.showPrev}">
+						<a class="page"
+							href="<c:url value="/${ph.sc.getQueryString(ph.beginPage-1)}"/>">&lt;</a>
+					</c:if>
+					<c:forEach var="i" begin="${ph.beginPage}" end="${ph.endPage}">
+						<a class="page ${i==ph.sc.page? "
+							paging-active" : ""}" href="<c:url value="/${ph.sc.getQueryString(i)}"/>">${i}</a>
+					</c:forEach>
+					<c:if test="${ph.showNext}">
+						<a class="page"
+							href="<c:url value="/${ph.sc.getQueryString(ph.endPage+1)}"/>">&gt;</a>
+					</c:if>
+				</c:if>
+			</div>
+		</form>
+	</div>
+	<script>
+/*===========================================건들면 진짜 죽임===========================================*/
+      var result1 = "";
+     
+         function getTime() {            
+
+                    var d = new Date();   // 현재 날짜와 시간
+                    var hur = d.getHours();      // 시
+                    var min = d.getMinutes();   //분
+                    var sec = d.getSeconds();   //초
+                    var timeBoard = document.getElementById("WhatTimeIsItNow"); // 값이 출력될 공간
+                    
+                    if(hur<10){
+                       hur = "0" + hur;
+                    }
+                    if(min<10){
+                       min = "0" + min;
+                    }
+                    if(sec<10){
+                       sec = "0" + sec;
+                    }
+                    var time = hur + ":" + min + ":" + sec   // 형식 지정
+                    timeBoard.innerHTML = time;   // 출력
+                    setTimeout(getTime);   //1000밀리초(1초) 마다 반복
+                 }
+/*===========================================건들면 진짜 죽임===========================================*/
+
+       var x= '';
+      var popupTrigger = document.querySelectorAll(".popup-trigger");
+      var closePopupButton = document.getElementById("closePopupButton");
+      var popup = document.getElementById("popup");
+      var popupImage = popup.querySelector("img");
+      
+
+      var imageUrls = [
+<%--    <%for (int i = 1; i <= 20; i++) { --%>
+//       out.print("\"/upload/" + i + ".jpg\"");
+//       if (i < 20) {
+//          out.print(",");
+//       }
+<%--    }%> --%>
+      ];
+
+      popupTrigger.forEach(function(trigger, index) { 
+           trigger.addEventListener("click", function() {
+//                var clickedImage = this.querySelector("img");
+//                popupImage.src = clickedImage.src;
+				popup.style.display = "block";
+				$('.center-column').addClass("show");
+				//document.querySelector(".center-column").classList.add = "show";
+            
+               //let smno = document.getElementById('s_mno').value;
+               let smno = this.querySelector('input').value;
+               //alert(tt);
+               $.ajax({
+                  dataType : "json",
+                  url : "/home/menu",
+                   type : "GET",
+                   data : {
+                      s_mno : smno
+                   },
+                   success : function(data, status) {
+                      console.log(data);
+                      console.log(data.s_sno);
+                      var modalImage = document.querySelector(".modal-image");
+                      modalImage.innerHTML = "";
+                      
+                      var menuTable = document.querySelector(".menu-table");
+                      menuTable.innerHTML = "";
+                      
+                         $.each(data,function(index, value) { // 값이 여러개 일 때는 반복문 사용
+                            console.log(index);
+                            
+/*===========================================건들면 진짜 죽임===========================================*/
+             // ajax 안에 있을 때 true 값이면 value로 데이터 안에 있는 값을 가져올 수 있다
+               x = setInterval(function(){
+                  
+                  var d = new Date();   // 현재 날짜와 시간
+                    var hur = d.getHours();      // 시
+                    var min = d.getMinutes();   //분
+                    var sec = d.getSeconds();   //초
+                    
+                    if(hur<10){
+                       hur = "0" + hur;
+                    }
+                    if(min<10){
+                       min = "0" + min;
+                    }
+                    if(sec<10){
+                       sec = "0" + sec;
+                    }
+                    // 현재시간
+                    var startTime = hur + ":" + min + ":" + sec   // 형식 지정
+                
+                // 웨이팅 등록 시간 + 웨이팅 시간
+                //endTime = sinserttime + stime;
+                //console.log(value);
+                var earlierTimeParts = value.s_inserttime.split(":");
+                var laterTimeParts = value.s_time.split(":");
+                
+
+                // 시, 분, 초를 정수로 변환합니다.
+                var earlierHours = parseInt(earlierTimeParts[0], 10);
+                var earlierMinutes = parseInt(earlierTimeParts[1], 10);
+                var earlierSeconds = parseInt(earlierTimeParts[2], 10);
+
+                var laterHours = parseInt(laterTimeParts[0], 10);
+                var laterMinutes = parseInt(laterTimeParts[1], 10);
+                var laterSeconds = parseInt(laterTimeParts[2], 10);
+
+                // 시간을 더합니다.
+                var totalHours = earlierHours + laterHours;
+                var totalMinutes = earlierMinutes + laterMinutes;
+                var totalSeconds = earlierSeconds + laterSeconds;
+
+                // 분과 초가 60을 초과하는 경우에 대한 처리를 합니다.
+                totalMinutes += Math.floor(totalSeconds / 60);
+                totalSeconds %= 60;
+
+                totalHours += Math.floor(totalMinutes / 60);
+                totalMinutes %= 60;
+
+                // 결과를 문자열로 만듭니다.
+                var result = totalHours + ":" + totalMinutes + ":" + totalSeconds;
+                
+                var laterDate = new Date("0000-01-01 " + startTime); // 현재시간
+                var earlierDate = new Date("0000-01-01 " + result); // 웨이팅 등록 시간 + 웨이팅 시간
+                var timeDifferenceInMilliseconds = earlierDate - laterDate;
+
+                var seconds = Math.floor(timeDifferenceInMilliseconds / 1000);
+                var minutes = Math.floor(seconds / 60);
+                seconds %= 60;
+                var hours = Math.floor(minutes / 60);
+                minutes %= 60;
+                
+                result1 = hours + "시간 " + minutes + "분 " + seconds + "초";
+                
+                if(earlierDate>=laterDate){
+                   if(hours==00){
+                        result1 = minutes + "분 " + seconds + "초";
+                        document.getElementById("demo").innerHTML = result1;
+                      }else{
+                         result1 = hours + "시간 " + minutes + "분 " + seconds + "초";
+                         document.getElementById("demo").innerHTML = result1;
+                      }
+                }else{
+                   result1 = "웨이팅 시간이 없습니다";
+                   document.getElementById("demo").innerHTML = result1;
+                }
+               });
+/*===========================================건들면 진짜 죽임===========================================*/
+               
+                             document.getElementById("remainingSeats").innerHTML = value.s_seat
+                             
+                             /*document.getElementById("time").innerHTML = value.s_inserttime*/
+                             
+                            if(index == 0){
+                               var divEl1 = document.createElement('div');
+                               divEl1.setAttribute("class", "modal-image-box");
+                               
+                               var img = document.createElement('img');
+                               img.setAttribute("src", "/upload/"+value.s_refname);
+                               img.setAttribute("class", "popup-image");
+                               divEl1.insertAdjacentElement("beforeend", img);
+                               
+                               var divEl2 = document.createElement('div');
+                               divEl2.className = 'image-text';
+                               divEl2.insertAdjacentHTML("beforeend",value.s_mname);
+                                
+                               modalImage.appendChild(divEl1);
+                               modalImage.appendChild(divEl2);
+                            }else{
+                                 var trEl = document.createElement('tr');
+                                 var tdEl_1 = document.createElement('td');
+                                 var tdEl_2 = document.createElement('td');
+                                 var tdEl_3 = document.createElement('td');
+                                 var img = document.createElement('img');
+                                 img.setAttribute("src", "/upload/"+value.s_refname);
+                                 
+                                 var menuTitle = document.createElement('div');
+                                 menuTitle.className = 'menu-title';
+                                 menuTitle.insertAdjacentHTML("beforeend",value.s_mname);
+                                 
+                                 var menuPrice = document.createElement('div');
+                                 menuPrice.className = 'menu-price';
+                                 menuPrice.insertAdjacentHTML("beforeend",value.s_mprice);
+                                 
+                                 tdEl_1.insertAdjacentElement("beforeend", img);
+                                 tdEl_2.insertAdjacentElement("beforeend", menuTitle);
+                                 tdEl_3.insertAdjacentElement("beforeend", menuPrice);
+                                 trEl.insertAdjacentElement("beforeend", tdEl_1);
+                                 trEl.insertAdjacentElement("beforeend", tdEl_2);
+                                 trEl.insertAdjacentElement("beforeend", tdEl_3);
+                                 menuTable.appendChild(trEl);
+                            }
+                         })
+                    },
+                    error : function(data, status) {
+                       alert("ERROR");
+                    }
+               });
+         });
+      }) 
+      /* 모달창 닫기 기능 */
+      closePopupButton.addEventListener("click", function() { 
+         popup.style.display = "none";
+         result1="";
+         document.getElementById("demo").innerHTML = result1;
+         $('.center-column').removeClass("show");
+//          document.querySelector(".center-column").classList.remove = "show";
+      }); 
+      
+      /* 모달창 ESC로 닫기 기능 */
+      window.addEventListener("keydown", function(event) {   
+         if (event.key === "Escape") {
+        	 closePopupButton.click(); // closePopupButton의 클릭 이벤트를 강제로 발생시킴
+         }
+      });
+      
+      
+      function formSubmit(){
+         console.log(111);
+         $('#searchForm').submit();
+      }
+   </script>
+</body>
+</html>
