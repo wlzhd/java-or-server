@@ -318,7 +318,7 @@ spring 우클릭 -> Propert 들어간 후 -> Deployment Assembly -> mysql 추가
 
 ------------------------------------------------------------------------------------------------
 root - context.xml 수정하기 / 1번과 2번 2중 하나만 사용하기
-(1)
+(1) mysql
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -364,7 +364,7 @@ root - context.xml 수정하기 / 1번과 2번 2중 하나만 사용하기
 </beans>
 
 ///////////////////////////////////////////////////////////////////////////////////
-(2)
+(2) 마리아 db
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:mvc="http://www.springframework.org/schema/mvc"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
